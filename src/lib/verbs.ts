@@ -431,6 +431,17 @@ const rawVerbs: Verb[] = [
     },
     notes: { presente: "Porre vient du latin 'ponere' : radical 'pon-' partout. Modèle pour comporre, proporre, supporre." },
   },
+  // RÉFLÉCHIS / PRONOMINAUX
+  reflexive("chiamarsi", "s'appeler", "chiam", "chiamato", "are",
+    "Chiamarsi = 'mi chiamo Luca' (je m'appelle Luca). Le pronom précède toujours le verbe."),
+  reflexive("alzarsi", "se lever", "alz", "alzato", "are"),
+  reflexive("lavarsi", "se laver", "lav", "lavato", "are"),
+  reflexive("svegliarsi", "se réveiller", "svegli", "svegliato", "are"),
+  reflexive("divertirsi", "s'amuser", "divert", "divertito", "ire",
+    "Divertirsi suit la conjugaison en -IRE simple : mi diverto, ti diverti, si diverte..."),
+  reflexive("sentirsi", "se sentir", "sent", "sentito", "ire"),
+  reflexive("ricordarsi", "se souvenir", "ricord", "ricordato", "are"),
+  reflexive("vestirsi", "s'habiller", "vest", "vestito", "ire"),
 ];
 
 // Fix the small typo above (extra space in venire noi form)
