@@ -29,12 +29,13 @@ export const TENSES: { id: Tense; fr: string; it: string }[] = [
   { id: "congiuntivo", fr: "Subjonctif", it: "Congiuntivo presente" },
 ];
 
-export type Difficulty = "courant" | "regulier" | "irregulier" | "difficile";
+export type Difficulty = "courant" | "regulier" | "irregulier" | "difficile" | "riflessivo";
 export const DIFFICULTIES: { id: Difficulty; label: string }[] = [
   { id: "courant", label: "Les plus courants" },
   { id: "regulier", label: "Réguliers" },
   { id: "irregulier", label: "Exceptions / Irréguliers" },
   { id: "difficile", label: "Difficiles" },
+  { id: "riflessivo", label: "Réfléchis / Pronominaux" },
 ];
 
 export interface Verb {
@@ -116,9 +117,62 @@ function passato(aux: "avere" | "essere", participle: string): Record<Person, st
 }
 
 function withPassato(v: Verb): Verb {
+  const pp = v.conj.passato_prossimo;
+  if (pp && Object.keys(pp).length > 0) return v;
   const conj = { ...v.conj };
   conj.passato_prossimo = passato(v.aux, v.participle);
   return { ...v, conj };
+}
+
+// Reflexive helpers -----------------------------------------------------------
+const REFL_PRONOUNS: Record<Person, string> = {
+  io: "mi", tu: "ti", lui: "si", noi: "ci", voi: "vi", loro: "si",
+};
+function toReflexive(conj: Record<Tense, Record<Person, string>>): Record<Tense, Record<Person, string>> {
+  const out = {} as Record<Tense, Record<Person, string>>;
+  (Object.keys(conj) as Tense[]).forEach((t) => {
+    const row = conj[t];
+    if (!row || Object.keys(row).length === 0) return;
+    out[t] = {
+      io: `${REFL_PRONOUNS.io} ${row.io}`,
+      tu: `${REFL_PRONOUNS.tu} ${row.tu}`,
+      lui: `${REFL_PRONOUNS.lui} ${row.lui}`,
+      noi: `${REFL_PRONOUNS.noi} ${row.noi}`,
+      voi: `${REFL_PRONOUNS.voi} ${row.voi}`,
+      loro: `${REFL_PRONOUNS.loro} ${row.loro}`,
+    };
+  });
+  return out;
+}
+function reflexivePassato(participle: string): Record<Person, string> {
+  const sing = participle;
+  const plur = participle.replace(/o$/, "i").replace(/a$/, "e");
+  return {
+    io: `mi sono ${sing}`,
+    tu: `ti sei ${sing}`,
+    lui: `si è ${sing}`,
+    noi: `ci siamo ${plur}`,
+    voi: `vi siete ${plur}`,
+    loro: `si sono ${plur}`,
+  };
+}
+function reflexive(infinitive: string, french: string, stem: string, participle: string, kind: "are"|"ere"|"ire"|"ire-isc", note?: string): Verb {
+  const base =
+    kind === "are" ? regAre(stem) :
+    kind === "ere" ? regEre(stem) :
+    kind === "ire-isc" ? regIre(stem, true) :
+    regIre(stem);
+  const conj = toReflexive(base);
+  conj.passato_prossimo = reflexivePassato(participle);
+  return {
+    infinitive, french, difficulty: "riflessivo", aux: "essere", participle,
+    conj,
+    notes: {
+      presente: "Verbe pronominal : le pronom réfléchi (mi/ti/si/ci/vi/si) se place AVANT le verbe conjugué.",
+      passato_prossimo: "Les verbes pronominaux se conjuguent toujours avec ESSERE. Le participe s'accorde avec le sujet (chiamato → chiamati au pluriel).",
+      ...(note ? { presente: note } : {}),
+    },
+  };
 }
 
 // ---- Verbs -----------------------------------------------------------------
