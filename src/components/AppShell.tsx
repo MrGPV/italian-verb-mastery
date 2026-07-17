@@ -16,7 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="grid h-9 w-9 place-items-center rounded-xl text-lg font-black text-primary-foreground shadow-[var(--shadow-soft)]" style={{ background: "var(--gradient-hero)" }}>
               C
             </span>
-            <span className="text-lg font-bold tracking-tight">Conjuga</span>
+            <span className="font-display text-xl font-black tracking-tight">Conjuga</span>
           </Link>
           <div className="flex items-center gap-1">
             <Button asChild variant="ghost" size="icon" aria-label="Accueil">

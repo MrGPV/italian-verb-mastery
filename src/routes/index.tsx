@@ -37,9 +37,10 @@ function Index() {
   return (
     <AppShell>
       <section className="mb-6 rounded-2xl p-6 text-primary-foreground shadow-[var(--shadow-soft)]" style={{ background: "var(--gradient-hero)" }}>
-        <p className="text-xs font-semibold uppercase tracking-widest opacity-80">Impariamo</p>
-        <h1 className="mt-1 text-3xl font-black leading-tight">La conjugaison italienne, sans stress.</h1>
-        <p className="mt-2 text-sm opacity-90">Configure ta session, entraîne-toi, progresse.</p>
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] opacity-90">Impariamo l'italiano</p>
+        <h1 className="mt-2 font-display text-3xl font-black leading-tight italic">La coniugazione,<br/>senza stress.</h1>
+        <p className="mt-3 text-sm opacity-90">Configure ta session, entraîne-toi, progresse.</p>
+        <div className="mt-4 h-1 w-24 rounded-full" style={{ background: "var(--gradient-tricolore)" }} />
       </section>
 
       <Card className="mb-4">
