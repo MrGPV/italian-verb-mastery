@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { loadConfig, loadStats, recordAttempt } from "@/lib/storage";
-import { buildSession, isCorrect, type Question } from "@/lib/session";
+import { buildSession, isCorrect, type Item } from "@/lib/session";
 import { TENSES } from "@/lib/verbs";
 import { CheckCircle2, XCircle, Info, ArrowRight, Trophy } from "lucide-react";
 
@@ -15,31 +15,39 @@ export const Route = createFileRoute("/exercise")({
   component: Exercise,
 });
 
-type State = "input" | "correct" | "wrong";
+type ItemState = "input" | "checked";
+const ACCENTS = ["à", "è", "é", "ì", "ò", "ù"];
 
 function Exercise() {
   const navigate = useNavigate();
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [i, setI] = useState(0);
-  const [input, setInput] = useState("");
-  const [state, setState] = useState<State>("input");
+  const [inputs, setInputs] = useState<string[]>([]);
+  const [state, setState] = useState<ItemState>("input");
+  const [results, setResults] = useState<boolean[]>([]);
   const [score, setScore] = useState({ ok: 0, ko: 0 });
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const focusedIdx = useRef<number>(0);
 
   useEffect(() => {
-    const qs = buildSession(loadConfig(), loadStats());
-    setQuestions(qs);
+    const its = buildSession(loadConfig(), loadStats());
+    setItems(its);
+    if (its[0]) setInputs(new Array(its[0].questions.length).fill(""));
   }, []);
 
-  const q = questions[i];
-  const done = questions.length > 0 && i >= questions.length;
-  const tenseLabel = useMemo(() => (q ? TENSES.find((t) => t.id === q.tense) : null), [q]);
+  const item = items[i];
+  const done = items.length > 0 && i >= items.length;
+  const tenseLabel = useMemo(() => (item ? TENSES.find((t) => t.id === item.tense) : null), [item]);
 
   useEffect(() => {
-    if (state === "input") inputRef.current?.focus();
+    if (state === "input") {
+      const first = inputRefs.current[0];
+      first?.focus();
+      focusedIdx.current = 0;
+    }
   }, [state, i]);
 
-  if (questions.length === 0) {
+  if (items.length === 0) {
     return (
       <AppShell>
         <Card><CardContent className="pt-6 text-center text-sm text-muted-foreground">Aucune question disponible avec ces réglages.</CardContent></Card>
@@ -55,8 +63,8 @@ function Exercise() {
         <Card className="animate-pop overflow-hidden">
           <div className="p-6 text-center text-primary-foreground" style={{ background: "var(--gradient-hero)" }}>
             <Trophy className="mx-auto h-12 w-12" />
-            <h2 className="mt-3 text-2xl font-black">Bravo !</h2>
-            <p className="mt-1 opacity-90">Session terminée</p>
+            <h2 className="mt-3 font-display text-3xl font-black">Bravissimo !</h2>
+            <p className="mt-1 italic opacity-90">Sessione completata</p>
           </div>
           <CardContent className="space-y-4 pt-6 text-center">
             <div className="text-5xl font-black text-foreground">{pct}%</div>
@@ -71,92 +79,151 @@ function Exercise() {
     );
   }
 
+  const allFilled = inputs.every((v) => v.trim().length > 0);
+
   const check = () => {
-    if (!q || state !== "input" || !input.trim()) return;
-    const ok = isCorrect(input, q.answer);
-    recordAttempt(q.verb.infinitive, q.tense, q.person, ok);
-    setScore((s) => (ok ? { ...s, ok: s.ok + 1 } : { ...s, ko: s.ko + 1 }));
-    setState(ok ? "correct" : "wrong");
-    if (ok) setTimeout(next, 700);
+    if (!item || state !== "input" || !allFilled) return;
+    const res = item.questions.map((q, k) => isCorrect(inputs[k], q.answer));
+    res.forEach((ok, k) => {
+      const q = item.questions[k];
+      recordAttempt(q.verb.infinitive, q.tense, q.person, ok);
+    });
+    const okCount = res.filter(Boolean).length;
+    setScore((s) => ({ ok: s.ok + okCount, ko: s.ko + (res.length - okCount) }));
+    setResults(res);
+    setState("checked");
+    if (res.every(Boolean)) setTimeout(next, 800);
   };
 
   const next = () => {
+    const nextIdx = i + 1;
     setState("input");
-    setInput("");
-    setI((n) => n + 1);
+    setResults([]);
+    setInputs(items[nextIdx] ? new Array(items[nextIdx].questions.length).fill("") : []);
+    setI(nextIdx);
   };
 
-  const progress = ((i) / questions.length) * 100;
+  const insertAccent = (ch: string) => {
+    const idx = focusedIdx.current;
+    const el = inputRefs.current[idx];
+    if (!el || state !== "input") return;
+    const start = el.selectionStart ?? el.value.length;
+    const end = el.selectionEnd ?? start;
+    const cur = inputs[idx] ?? "";
+    const next = cur.slice(0, start) + ch + cur.slice(end);
+    setInputs((arr) => arr.map((v, k) => (k === idx ? next : v)));
+    requestAnimationFrame(() => {
+      el.focus();
+      const pos = start + ch.length;
+      el.setSelectionRange(pos, pos);
+    });
+  };
+
+  const progress = ((i) / items.length) * 100;
+  const allCorrect = state === "checked" && results.every(Boolean);
 
   return (
     <AppShell>
       <div className="mb-4 flex items-center gap-3">
         <Progress value={progress} className="h-2" />
-        <span className="text-xs font-semibold tabular-nums text-muted-foreground">{i + 1}/{questions.length}</span>
+        <span className="text-xs font-semibold tabular-nums text-muted-foreground">{i + 1}/{items.length}</span>
       </div>
 
-      <Card className={`mb-4 overflow-hidden ${state === "wrong" ? "animate-shake" : ""} ${state === "correct" ? "animate-pop" : ""}`}>
+      <Card className={`mb-4 overflow-hidden ${state === "checked" && !allCorrect ? "animate-shake" : ""} ${allCorrect ? "animate-pop" : ""}`}>
+        <div className="tricolore-bar" />
         <CardContent className="pt-6">
           <div className="mb-4 flex items-center justify-between text-xs">
             <span className="rounded-full bg-primary/10 px-3 py-1 font-semibold uppercase tracking-wide text-primary">
               {tenseLabel?.fr}
             </span>
-            <span className="italic text-muted-foreground">{tenseLabel?.it}</span>
+            <span className="font-display italic text-muted-foreground">{tenseLabel?.it}</span>
           </div>
 
           <div className="mb-6 text-center">
-            <div className="text-4xl font-black tracking-tight text-foreground">{q.verb.infinitive}</div>
-            <div className="mt-1 text-sm italic text-muted-foreground">« {q.verb.french} »</div>
+            <div className="font-display text-4xl font-black tracking-tight text-foreground">{item.verb.infinitive}</div>
+            <div className="mt-1 text-sm italic text-muted-foreground">« {item.verb.french} »</div>
           </div>
 
-          <div className="mb-2 text-center text-sm font-medium text-muted-foreground">Conjugue avec :</div>
-          <div className="mb-5 text-center text-2xl font-bold text-accent-foreground">
-            <span className="rounded-lg bg-accent/60 px-3 py-1">{q.subject}</span>
-          </div>
+          {item.kind === "complet" && (
+            <div className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Conjugue les 6 personnes
+            </div>
+          )}
 
           <form onSubmit={(e) => { e.preventDefault(); state === "input" ? check() : next(); }}>
-            <Input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={state !== "input"}
-              placeholder="Ta réponse..."
-              autoComplete="off"
-              autoCapitalize="none"
-              spellCheck={false}
-              className={`h-14 text-center text-xl font-semibold transition-colors ${
-                state === "correct" ? "border-success bg-success/10 text-success" :
-                state === "wrong" ? "border-destructive bg-destructive/10 text-destructive" : ""
-              }`}
-            />
+            <div className="space-y-2">
+              {item.questions.map((q, k) => {
+                const checked = state === "checked";
+                const ok = results[k];
+                const border = !checked ? "" : ok ? "border-success bg-success/10" : "border-destructive bg-destructive/10";
+                return (
+                  <div key={k} className="grid grid-cols-[5.5rem_1fr] items-center gap-2">
+                    <div className="text-right">
+                      <span className="rounded-md bg-accent/50 px-2 py-1 text-sm font-bold text-accent-foreground">
+                        {q.subject}
+                      </span>
+                    </div>
+                    <div>
+                      <Input
+                        ref={(el) => { inputRefs.current[k] = el; }}
+                        value={inputs[k] ?? ""}
+                        onChange={(e) => setInputs((arr) => arr.map((v, j) => (j === k ? e.target.value : v)))}
+                        onFocus={() => { focusedIdx.current = k; }}
+                        disabled={checked}
+                        placeholder="…"
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        className={`h-11 text-base font-semibold transition-colors ${border}`}
+                      />
+                      {checked && !ok && (
+                        <div className="mt-1 flex items-center gap-1 pl-1 text-xs">
+                          <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />
+                          <span className="text-muted-foreground">Bonne réponse :</span>
+                          <span className="font-bold text-foreground">{q.answer}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
             {state === "input" && (
-              <Button type="submit" size="lg" className="mt-4 h-14 w-full text-base font-bold" disabled={!input.trim()}>
-                Vérifier
-              </Button>
+              <>
+                <div className="mt-4 flex justify-center gap-1.5">
+                  {ACCENTS.map((ch) => (
+                    <button
+                      key={ch}
+                      type="button"
+                      onClick={() => insertAccent(ch)}
+                      className="h-10 w-10 rounded-lg border border-border bg-card text-lg font-bold text-foreground shadow-sm transition-colors hover:border-primary hover:bg-primary/10 active:scale-95"
+                      aria-label={`Insérer ${ch}`}
+                    >
+                      {ch}
+                    </button>
+                  ))}
+                </div>
+                <Button type="submit" size="lg" className="mt-4 h-14 w-full text-base font-bold" disabled={!allFilled}>
+                  Vérifier
+                </Button>
+              </>
             )}
 
-            {state === "correct" && (
+            {state === "checked" && allCorrect && (
               <div className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-success/10 py-3 font-bold text-success">
-                <CheckCircle2 className="h-5 w-5" /> Bravo !
+                <CheckCircle2 className="h-5 w-5" /> Bravissimo !
               </div>
             )}
 
-            {state === "wrong" && (
+            {state === "checked" && !allCorrect && (
               <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-2 rounded-xl bg-destructive/10 p-3 text-destructive">
-                  <XCircle className="h-5 w-5 shrink-0" />
-                  <div className="text-sm">
-                    <div className="font-semibold">Bonne réponse :</div>
-                    <div className="text-lg font-black text-foreground">{q.answer}</div>
-                  </div>
-                </div>
-                {q.verb.notes?.[q.tense] && (
+                {item.verb.notes?.[item.tense] && (
                   <div className="rounded-xl border border-accent/40 bg-accent/10 p-3">
                     <div className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-foreground">
                       <Info className="h-3.5 w-3.5" /> Explication
                     </div>
-                    <p className="text-sm text-foreground">{q.verb.notes[q.tense]}</p>
+                    <p className="text-sm text-foreground">{item.verb.notes[item.tense]}</p>
                   </div>
                 )}
                 <Button type="submit" size="lg" className="h-14 w-full text-base font-bold">
