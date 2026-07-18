@@ -6,7 +6,7 @@ export const PERSONS: Person[] = ["io", "tu", "lui", "noi", "voi", "loro"];
 export const PERSON_LABEL: Record<Person, string> = {
   io: "io",
   tu: "tu",
-  lui: "lui/lei",
+  lui: "lui",
   noi: "noi",
   voi: "voi",
   loro: "loro",
@@ -18,7 +18,10 @@ export type Tense =
   | "imperfetto"
   | "futuro"
   | "condizionale"
-  | "congiuntivo";
+  | "congiuntivo"
+  | "imperativo"
+  | "participio"
+  | "gerundio";
 
 export const TENSES: { id: Tense; fr: string; it: string }[] = [
   { id: "presente", fr: "Présent", it: "Presente" },
@@ -27,6 +30,9 @@ export const TENSES: { id: Tense; fr: string; it: string }[] = [
   { id: "futuro", fr: "Futur", it: "Futuro semplice" },
   { id: "condizionale", fr: "Conditionnel", it: "Condizionale presente" },
   { id: "congiuntivo", fr: "Subjonctif", it: "Congiuntivo presente" },
+  { id: "imperativo", fr: "Impératif", it: "Imperativo" },
+  { id: "participio", fr: "Participe passé", it: "Participio passato" },
+  { id: "gerundio", fr: "Gérondif", it: "Gerundio presente" },
 ];
 
 export type Difficulty = "courant" | "regulier" | "irregulier" | "difficile" | "riflessivo";
@@ -46,7 +52,7 @@ export interface Verb {
   participle: string; // past participle
   gerund?: string;
   notes?: Partial<Record<Tense, string>>;
-  conj: Partial<Record<Tense, Record<Person, string>>>;
+  conj: Partial<Record<Tense, Partial<Record<Person, string>>>>;
 }
 
 // Helpers to generate regular -are/-ere/-ire conjugations
@@ -58,6 +64,9 @@ function regAre(stem: string): Record<Tense, Record<Person, string>> {
     condizionale: { io: stem + "erei", tu: stem + "eresti", lui: stem + "erebbe", noi: stem + "eremmo", voi: stem + "ereste", loro: stem + "erebbero" },
     congiuntivo: { io: stem + "i", tu: stem + "i", lui: stem + "i", noi: stem + "iamo", voi: stem + "iate", loro: stem + "ino" },
     passato_prossimo: {} as any,
+    imperativo: { io: "", tu: stem + "a", lui: "", noi: stem + "iamo", voi: stem + "ate", loro: "" },
+    participio: { io: "", tu: "", lui: stem + "ato", noi: "", voi: "", loro: "" },
+    gerundio: { io: "", tu: "", lui: stem + "ando", noi: "", voi: "", loro: "" },
   };
 }
 function regEre(stem: string): Record<Tense, Record<Person, string>> {
@@ -68,6 +77,9 @@ function regEre(stem: string): Record<Tense, Record<Person, string>> {
     condizionale: { io: stem + "erei", tu: stem + "eresti", lui: stem + "erebbe", noi: stem + "eremmo", voi: stem + "ereste", loro: stem + "erebbero" },
     congiuntivo: { io: stem + "a", tu: stem + "a", lui: stem + "a", noi: stem + "iamo", voi: stem + "iate", loro: stem + "ano" },
     passato_prossimo: {} as any,
+    imperativo: { io: "", tu: stem + "i", lui: "", noi: stem + "iamo", voi: stem + "ete", loro: "" },
+    participio: { io: "", tu: "", lui: stem + "uto", noi: "", voi: "", loro: "" },
+    gerundio: { io: "", tu: "", lui: stem + "endo", noi: "", voi: "", loro: "" },
   };
 }
 function regIre(stem: string, isc = false): Record<Tense, Record<Person, string>> {
@@ -77,6 +89,7 @@ function regIre(stem: string, isc = false): Record<Tense, Record<Person, string>
   const cong = isc
     ? { io: stem + "isca", tu: stem + "isca", lui: stem + "isca", noi: stem + "iamo", voi: stem + "iate", loro: stem + "iscano" }
     : { io: stem + "a", tu: stem + "a", lui: stem + "a", noi: stem + "iamo", voi: stem + "iate", loro: stem + "ano" };
+  const impTu = isc ? stem + "isci" : stem + "i";
   return {
     presente: pres,
     imperfetto: { io: stem + "ivo", tu: stem + "ivi", lui: stem + "iva", noi: stem + "ivamo", voi: stem + "ivate", loro: stem + "ivano" },
@@ -84,6 +97,9 @@ function regIre(stem: string, isc = false): Record<Tense, Record<Person, string>
     condizionale: { io: stem + "irei", tu: stem + "iresti", lui: stem + "irebbe", noi: stem + "iremmo", voi: stem + "ireste", loro: stem + "irebbero" },
     congiuntivo: cong,
     passato_prossimo: {} as any,
+    imperativo: { io: "", tu: impTu, lui: "", noi: stem + "iamo", voi: stem + "ite", loro: "" },
+    participio: { io: "", tu: "", lui: stem + "ito", noi: "", voi: "", loro: "" },
+    gerundio: { io: "", tu: "", lui: stem + "endo", noi: "", voi: "", loro: "" },
   };
 }
 
