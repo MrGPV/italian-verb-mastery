@@ -36,11 +36,12 @@ function Index() {
 
   return (
     <AppShell>
-      <section className="mb-6 rounded-2xl p-6 text-primary-foreground shadow-[var(--shadow-soft)]" style={{ background: "var(--gradient-hero)" }}>
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] opacity-90">Impariamo l'italiano</p>
-        <h1 className="mt-2 font-display text-3xl font-black leading-tight italic">La coniugazione,<br/>senza stress.</h1>
-        <p className="mt-3 text-sm opacity-90">Configure ta session, entraîne-toi, progresse.</p>
-        <div className="mt-4 h-1 w-24 rounded-full" style={{ background: "var(--gradient-tricolore)" }} />
+      <section className="relative mb-6 overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-[var(--shadow-soft)]">
+        <div className="tricolore-bar absolute inset-x-0 top-0" />
+        <p className="mt-2 font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Impariamo l'italiano</p>
+        <h1 className="mt-2 font-display text-3xl font-black leading-tight italic text-foreground">La coniugazione,<br/><span className="text-primary">senza stress.</span></h1>
+        <p className="mt-3 text-sm text-muted-foreground">Configure ta session, entraîne-toi, progresse.</p>
+        <div className="mt-4 h-1.5 w-28 rounded-full" style={{ background: "var(--gradient-tricolore)" }} />
       </section>
 
       <Card className="mb-4">

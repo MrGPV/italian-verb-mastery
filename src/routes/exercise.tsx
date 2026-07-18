@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { loadConfig, loadStats, recordAttempt } from "@/lib/storage";
 import { buildSession, isCorrect, type Item } from "@/lib/session";
-import { TENSES } from "@/lib/verbs";
-import { CheckCircle2, XCircle, Info, ArrowRight, Trophy } from "lucide-react";
+import { PERSONS, PERSON_LABEL, TENSES } from "@/lib/verbs";
+import { CheckCircle2, XCircle, BookOpen, ArrowRight, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/exercise")({
   head: () => ({ meta: [{ title: "Session — Conjuga" }, { name: "robots", content: "noindex" }] }),
@@ -61,10 +61,11 @@ function Exercise() {
     return (
       <AppShell>
         <Card className="animate-pop overflow-hidden">
-          <div className="p-6 text-center text-primary-foreground" style={{ background: "var(--gradient-hero)" }}>
-            <Trophy className="mx-auto h-12 w-12" />
-            <h2 className="mt-3 font-display text-3xl font-black">Bravissimo !</h2>
-            <p className="mt-1 italic opacity-90">Sessione completata</p>
+          <div className="tricolore-bar" />
+          <div className="p-6 text-center">
+            <Trophy className="mx-auto h-12 w-12 text-primary" />
+            <h2 className="mt-3 font-display text-3xl font-black italic text-foreground">Bravissimo !</h2>
+            <p className="mt-1 italic text-muted-foreground">Sessione completata</p>
           </div>
           <CardContent className="space-y-4 pt-6 text-center">
             <div className="text-5xl font-black text-foreground">{pct}%</div>
@@ -218,14 +219,30 @@ function Exercise() {
 
             {state === "checked" && !allCorrect && (
               <div className="mt-4 space-y-3">
-                {item.verb.notes?.[item.tense] && (
-                  <div className="rounded-xl border border-accent/40 bg-accent/10 p-3">
-                    <div className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-foreground">
-                      <Info className="h-3.5 w-3.5" /> Explication
-                    </div>
-                    <p className="text-sm text-foreground">{item.verb.notes[item.tense]}</p>
+                <div className="rounded-xl border border-accent/40 bg-accent/10 p-3">
+                  <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-foreground">
+                    <BookOpen className="h-3.5 w-3.5" />
+                    Conjugaison — <span className="italic">{item.verb.infinitive}</span> · {tenseLabel?.it}
                   </div>
-                )}
+                  <div className="grid grid-cols-1 gap-1 text-sm sm:grid-cols-2">
+                    {PERSONS.map((p) => {
+                      const ans = item.verb.conj[item.tense]?.[p];
+                      if (!ans) return null;
+                      const label =
+                        item.tense === "participio" || item.tense === "gerundio"
+                          ? "→"
+                          : item.tense === "imperativo"
+                          ? p + " !"
+                          : PERSON_LABEL[p];
+                      return (
+                        <div key={p} className="flex items-baseline gap-2">
+                          <span className="w-14 shrink-0 text-right text-xs font-semibold text-muted-foreground">{label}</span>
+                          <span className="font-semibold text-foreground">{ans}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
                 <Button type="submit" size="lg" className="h-14 w-full text-base font-bold">
                   Continuer <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

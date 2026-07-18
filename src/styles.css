@@ -92,8 +92,8 @@
   --tricolore-green: oklch(0.6 0.17 148);
   --tricolore-white: oklch(0.99 0.005 90);
   --tricolore-red: oklch(0.55 0.22 25);
-  --gradient-hero: linear-gradient(135deg, oklch(0.55 0.22 25) 0%, oklch(0.7 0.18 50) 55%, oklch(0.6 0.17 148) 100%);
-  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0 33.33%, var(--tricolore-white) 33.33% 66.66%, var(--tricolore-red) 66.66% 100%);
+  --gradient-hero: linear-gradient(115deg, oklch(0.6 0.17 148) 0%, oklch(0.94 0.03 90) 50%, oklch(0.55 0.22 25) 100%);
+  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0%, oklch(0.98 0.008 90) 50%, var(--tricolore-red) 100%);
   --shadow-soft: 0 8px 30px -12px oklch(0.55 0.22 25 / 0.3);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -135,8 +135,8 @@
   --tricolore-green: oklch(0.65 0.17 148);
   --tricolore-white: oklch(0.94 0.01 85);
   --tricolore-red: oklch(0.66 0.22 25);
-  --gradient-hero: linear-gradient(135deg, oklch(0.66 0.22 25) 0%, oklch(0.72 0.18 50) 55%, oklch(0.62 0.17 148) 100%);
-  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0 33.33%, var(--tricolore-white) 33.33% 66.66%, var(--tricolore-red) 66.66% 100%);
+  --gradient-hero: linear-gradient(115deg, oklch(0.62 0.17 148) 0%, oklch(0.9 0.02 85) 50%, oklch(0.66 0.22 25) 100%);
+  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0%, oklch(0.94 0.01 85) 50%, var(--tricolore-red) 100%);
   --shadow-soft: 0 4px 24px -8px oklch(0 0 0 / 0.5);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -186,7 +186,7 @@
   animation: pop-in 0.35s ease-out;
 }
 @utility tricolore-bar {
-  height: 4px;
+  height: 5px;
   width: 100%;
   background: var(--gradient-tricolore);
 }
