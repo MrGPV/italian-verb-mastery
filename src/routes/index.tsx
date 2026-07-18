@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,7 +138,7 @@ function Index() {
       {!canStart && <p className="mt-2 text-center text-xs text-muted-foreground">Sélectionne au moins un niveau et un temps.</p>}
 
       <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full border-2 text-sm font-bold" style={{ borderColor: "var(--tricolore-green)", color: "var(--tricolore-green)" }}>
-        <a href="/dictionary"><BookOpen className="mr-2 h-4 w-4" />Consulter la conjugaison d'un verbe</a>
+        <Link to="/dictionary"><BookOpen className="mr-2 h-4 w-4" />Consulter la conjugaison d'un verbe</Link>
       </Button>
     </AppShell>
   );

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatsRouteImport } from './routes/stats'
 import { Route as ExerciseRouteImport } from './routes/exercise'
+import { Route as DictionaryRouteImport } from './routes/dictionary'
 import { Route as IndexRouteImport } from './routes/index'
 
 const StatsRoute = StatsRouteImport.update({
@@ -23,6 +24,11 @@ const ExerciseRoute = ExerciseRouteImport.update({
   path: '/exercise',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DictionaryRoute = DictionaryRouteImport.update({
+  id: '/dictionary',
+  path: '/dictionary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,30 +37,34 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dictionary': typeof DictionaryRoute
   '/exercise': typeof ExerciseRoute
   '/stats': typeof StatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dictionary': typeof DictionaryRoute
   '/exercise': typeof ExerciseRoute
   '/stats': typeof StatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dictionary': typeof DictionaryRoute
   '/exercise': typeof ExerciseRoute
   '/stats': typeof StatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/exercise' | '/stats'
+  fullPaths: '/' | '/dictionary' | '/exercise' | '/stats'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/exercise' | '/stats'
-  id: '__root__' | '/' | '/exercise' | '/stats'
+  to: '/' | '/dictionary' | '/exercise' | '/stats'
+  id: '__root__' | '/' | '/dictionary' | '/exercise' | '/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DictionaryRoute: typeof DictionaryRoute
   ExerciseRoute: typeof ExerciseRoute
   StatsRoute: typeof StatsRoute
 }
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExerciseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dictionary': {
+      id: '/dictionary'
+      path: '/dictionary'
+      fullPath: '/dictionary'
+      preLoaderRoute: typeof DictionaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DictionaryRoute: DictionaryRoute,
   ExerciseRoute: ExerciseRoute,
   StatsRoute: StatsRoute,
 }
