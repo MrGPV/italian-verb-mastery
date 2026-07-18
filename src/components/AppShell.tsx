@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Moon, Sun, BarChart3, Home } from "lucide-react";
+import { Moon, Sun, BarChart3, Home, BookOpen } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
@@ -21,6 +21,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-1">
             <Button asChild variant="ghost" size="icon" aria-label="Accueil">
               <Link to="/"><Home className="h-5 w-5" /></Link>
+            </Button>
+            <Button asChild variant="ghost" size="icon" aria-label="Coniugatore">
+              <Link to="/dictionary"><BookOpen className="h-5 w-5" /></Link>
             </Button>
             <Button asChild variant="ghost" size="icon" aria-label="Statistiques">
               <Link to="/stats"><BarChart3 className="h-5 w-5" /></Link>

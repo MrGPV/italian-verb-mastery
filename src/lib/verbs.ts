@@ -291,6 +291,47 @@ const rawVerbs: Verb[] = [
     },
     notes: { presente: "Attention à l'accent sur 'dà' (3e pers.) pour le distinguer de la préposition 'da'." },
   },
+  {
+    infinitive: "vedere", french: "voir", difficulty: "courant", aux: "avere", participle: "visto",
+    gerund: "vedendo",
+    conj: {
+      presente: { io: "vedo", tu: "vedi", lui: "vede", noi: "vediamo", voi: "vedete", loro: "vedono" },
+      imperfetto: { io: "vedevo", tu: "vedevi", lui: "vedeva", noi: "vedevamo", voi: "vedevate", loro: "vedevano" },
+      futuro: { io: "vedrò", tu: "vedrai", lui: "vedrà", noi: "vedremo", voi: "vedrete", loro: "vedranno" },
+      condizionale: { io: "vedrei", tu: "vedresti", lui: "vedrebbe", noi: "vedremmo", voi: "vedreste", loro: "vedrebbero" },
+      congiuntivo: { io: "veda", tu: "veda", lui: "veda", noi: "vediamo", voi: "vediate", loro: "vedano" },
+    },
+    notes: { presente: "Vedere a un participe irrégulier ('visto') et un futur contracté ('vedrò')." },
+  },
+  {
+    infinitive: "sentire", french: "entendre / sentir", difficulty: "courant", aux: "avere", participle: "sentito",
+    conj: regIre("sent"),
+    notes: { presente: "Sentire = entendre (perception). Se conjugue en -IRE simple (sans -isc-)." },
+  },
+  {
+    infinitive: "prendere", french: "prendre", difficulty: "courant", aux: "avere", participle: "preso",
+    gerund: "prendendo",
+    conj: {
+      presente: { io: "prendo", tu: "prendi", lui: "prende", noi: "prendiamo", voi: "prendete", loro: "prendono" },
+      imperfetto: { io: "prendevo", tu: "prendevi", lui: "prendeva", noi: "prendevamo", voi: "prendevate", loro: "prendevano" },
+      futuro: { io: "prenderò", tu: "prenderai", lui: "prenderà", noi: "prenderemo", voi: "prenderete", loro: "prenderanno" },
+      condizionale: { io: "prenderei", tu: "prenderesti", lui: "prenderebbe", noi: "prenderemmo", voi: "prendereste", loro: "prenderebbero" },
+      congiuntivo: { io: "prenda", tu: "prenda", lui: "prenda", noi: "prendiamo", voi: "prendiate", loro: "prendano" },
+    },
+    notes: { passato_prossimo: "Participe irrégulier : 'preso'." },
+  },
+  {
+    infinitive: "mettere", french: "mettre / poser", difficulty: "courant", aux: "avere", participle: "messo",
+    gerund: "mettendo",
+    conj: {
+      presente: { io: "metto", tu: "metti", lui: "mette", noi: "mettiamo", voi: "mettete", loro: "mettono" },
+      imperfetto: { io: "mettevo", tu: "mettevi", lui: "metteva", noi: "mettevamo", voi: "mettevate", loro: "mettevano" },
+      futuro: { io: "metterò", tu: "metterai", lui: "metterà", noi: "metteremo", voi: "metterete", loro: "metteranno" },
+      condizionale: { io: "metterei", tu: "metteresti", lui: "metterebbe", noi: "metteremmo", voi: "mettereste", loro: "metterebbero" },
+      congiuntivo: { io: "metta", tu: "metta", lui: "metta", noi: "mettiamo", voi: "mettiate", loro: "mettano" },
+    },
+    notes: { passato_prossimo: "Participe irrégulier : 'messo'." },
+  },
   // RÉGULIERS
   {
     infinitive: "parlare", french: "parler", difficulty: "regulier", aux: "avere", participle: "parlato",
@@ -330,6 +371,12 @@ const rawVerbs: Verb[] = [
     conj: regAre("arriv"),
     notes: { passato_prossimo: "Verbe de mouvement : auxiliaire ESSERE. Le participe passé s'accorde en genre et en nombre avec le sujet." },
   },
+  { infinitive: "cantare", french: "chanter", difficulty: "regulier", aux: "avere", participle: "cantato", conj: regAre("cant"), notes: { presente: "Verbe régulier en -ARE." } },
+  { infinitive: "lavorare", french: "travailler", difficulty: "regulier", aux: "avere", participle: "lavorato", conj: regAre("lavor") },
+  { infinitive: "vendere", french: "vendre", difficulty: "regulier", aux: "avere", participle: "venduto", conj: regEre("vend") },
+  { infinitive: "partire", french: "partir", difficulty: "regulier", aux: "essere", participle: "partito", conj: regIre("part"), notes: { passato_prossimo: "Verbe de mouvement : auxiliaire ESSERE, le participe s'accorde avec le sujet." } },
+  { infinitive: "ricevere", french: "recevoir", difficulty: "regulier", aux: "avere", participle: "ricevuto", conj: regEre("ricev") },
+  { infinitive: "capire", french: "comprendre / saisir", difficulty: "regulier", aux: "avere", participle: "capito", conj: regIre("cap", true), notes: { presente: "Verbe en -IRE avec l'infixe -ISC- : capisco, capisci, capisce, capiamo, capite, capiscono." } },
   // IRRÉGULIERS
   {
     infinitive: "potere", french: "pouvoir", difficulty: "irregulier", aux: "avere", participle: "potuto",
@@ -403,6 +450,50 @@ const rawVerbs: Verb[] = [
     },
     notes: { presente: "Dire vient du latin 'dicere' : radical 'dic-' à toutes les personnes sauf 'voi' (dite)." },
   },
+  {
+    infinitive: "tenere", french: "tenir / garder", difficulty: "irregulier", aux: "avere", participle: "tenuto",
+    conj: {
+      presente: { io: "tengo", tu: "tieni", lui: "tiene", noi: "teniamo", voi: "tenete", loro: "tengono" },
+      imperfetto: { io: "tenevo", tu: "tenevi", lui: "teneva", noi: "tenevamo", voi: "tenevate", loro: "tenevano" },
+      futuro: { io: "terrò", tu: "terrai", lui: "terrà", noi: "terremo", voi: "terrete", loro: "terranno" },
+      condizionale: { io: "terrei", tu: "terresti", lui: "terrebbe", noi: "terremmo", voi: "terreste", loro: "terrebbero" },
+      congiuntivo: { io: "tenga", tu: "tenga", lui: "tenga", noi: "teniamo", voi: "teniate", loro: "tengano" },
+    },
+    notes: { presente: "Alternance 'teng-' / 'tien-' / 'ten-'. Futur avec double 'r' : terrò." },
+  },
+  {
+    infinitive: "salire", french: "monter", difficulty: "irregulier", aux: "essere", participle: "salito",
+    conj: {
+      presente: { io: "salgo", tu: "sali", lui: "sale", noi: "saliamo", voi: "salite", loro: "salgono" },
+      imperfetto: { io: "salivo", tu: "salivi", lui: "saliva", noi: "salivamo", voi: "salivate", loro: "salivano" },
+      futuro: { io: "salirò", tu: "salirai", lui: "salirà", noi: "saliremo", voi: "salirete", loro: "saliranno" },
+      condizionale: { io: "salirei", tu: "saliresti", lui: "salirebbe", noi: "saliremmo", voi: "salireste", loro: "salirebbero" },
+      congiuntivo: { io: "salga", tu: "salga", lui: "salga", noi: "saliamo", voi: "saliate", loro: "salgano" },
+    },
+    notes: { presente: "'g' apparaît à io et loro : salgo, salgono." },
+  },
+  {
+    infinitive: "morire", french: "mourir", difficulty: "irregulier", aux: "essere", participle: "morto",
+    conj: {
+      presente: { io: "muoio", tu: "muori", lui: "muore", noi: "moriamo", voi: "morite", loro: "muoiono" },
+      imperfetto: { io: "morivo", tu: "morivi", lui: "moriva", noi: "morivamo", voi: "morivate", loro: "morivano" },
+      futuro: { io: "morirò", tu: "morirai", lui: "morirà", noi: "moriremo", voi: "morirete", loro: "moriranno" },
+      condizionale: { io: "morirei", tu: "moriresti", lui: "morirebbe", noi: "moriremmo", voi: "morireste", loro: "morirebbero" },
+      congiuntivo: { io: "muoia", tu: "muoia", lui: "muoia", noi: "moriamo", voi: "moriate", loro: "muoiano" },
+    },
+    notes: { presente: "Diphtongue 'uo' aux personnes fortes : muoio, muori... Participe irrégulier : 'morto'." },
+  },
+  {
+    infinitive: "piacere", french: "plaire", difficulty: "irregulier", aux: "essere", participle: "piaciuto",
+    conj: {
+      presente: { io: "piaccio", tu: "piaci", lui: "piace", noi: "piacciamo", voi: "piacete", loro: "piacciono" },
+      imperfetto: { io: "piacevo", tu: "piacevi", lui: "piaceva", noi: "piacevamo", voi: "piacevate", loro: "piacevano" },
+      futuro: { io: "piacerò", tu: "piacerai", lui: "piacerà", noi: "piaceremo", voi: "piacerete", loro: "piaceranno" },
+      condizionale: { io: "piacerei", tu: "piaceresti", lui: "piacerebbe", noi: "piaceremmo", voi: "piacereste", loro: "piacerebbero" },
+      congiuntivo: { io: "piaccia", tu: "piaccia", lui: "piaccia", noi: "piacciamo", voi: "piacciate", loro: "piacciano" },
+    },
+    notes: { presente: "Double 'c' à io et loro : piaccio, piacciono. Se construit à l'envers : 'mi piace' = ça me plaît." },
+  },
   // DIFFICILES
   {
     infinitive: "bere", french: "boire", difficulty: "difficile", aux: "avere", participle: "bevuto",
@@ -464,6 +555,66 @@ const rawVerbs: Verb[] = [
     },
     notes: { presente: "Porre vient du latin 'ponere' : radical 'pon-' partout. Modèle pour comporre, proporre, supporre." },
   },
+  {
+    infinitive: "tradurre", french: "traduire", difficulty: "difficile", aux: "avere", participle: "tradotto",
+    gerund: "traducendo",
+    conj: {
+      presente: { io: "traduco", tu: "traduci", lui: "traduce", noi: "traduciamo", voi: "traducete", loro: "traducono" },
+      imperfetto: { io: "traducevo", tu: "traducevi", lui: "traduceva", noi: "traducevamo", voi: "traducevate", loro: "traducevano" },
+      futuro: { io: "tradurrò", tu: "tradurrai", lui: "tradurrà", noi: "tradurremo", voi: "tradurrete", loro: "tradurranno" },
+      condizionale: { io: "tradurrei", tu: "tradurresti", lui: "tradurrebbe", noi: "tradurremmo", voi: "tradurreste", loro: "tradurrebbero" },
+      congiuntivo: { io: "traduca", tu: "traduca", lui: "traduca", noi: "traduciamo", voi: "traduciate", loro: "traducano" },
+    },
+    notes: { presente: "Du latin 'traducere' : radical 'traduc-'. Futur avec double 'r' : tradurrò. Participe : tradotto." },
+  },
+  {
+    infinitive: "condurre", french: "conduire / mener", difficulty: "difficile", aux: "avere", participle: "condotto",
+    gerund: "conducendo",
+    conj: {
+      presente: { io: "conduco", tu: "conduci", lui: "conduce", noi: "conduciamo", voi: "conducete", loro: "conducono" },
+      imperfetto: { io: "conducevo", tu: "conducevi", lui: "conduceva", noi: "conducevamo", voi: "conducevate", loro: "conducevano" },
+      futuro: { io: "condurrò", tu: "condurrai", lui: "condurrà", noi: "condurremo", voi: "condurrete", loro: "condurranno" },
+      condizionale: { io: "condurrei", tu: "condurresti", lui: "condurrebbe", noi: "condurremmo", voi: "condurreste", loro: "condurrebbero" },
+      congiuntivo: { io: "conduca", tu: "conduca", lui: "conduca", noi: "conduciamo", voi: "conduciate", loro: "conducano" },
+    },
+    notes: { presente: "Même modèle que tradurre : radical 'conduc-', participe 'condotto'." },
+  },
+  {
+    infinitive: "cogliere", french: "cueillir / saisir", difficulty: "difficile", aux: "avere", participle: "colto",
+    gerund: "cogliendo",
+    conj: {
+      presente: { io: "colgo", tu: "cogli", lui: "coglie", noi: "cogliamo", voi: "cogliete", loro: "colgono" },
+      imperfetto: { io: "coglievo", tu: "coglievi", lui: "coglieva", noi: "coglievamo", voi: "coglievate", loro: "coglievano" },
+      futuro: { io: "coglierò", tu: "coglierai", lui: "coglierà", noi: "coglieremo", voi: "coglierete", loro: "coglieranno" },
+      condizionale: { io: "coglierei", tu: "coglieresti", lui: "coglierebbe", noi: "coglieremmo", voi: "cogliereste", loro: "coglierebbero" },
+      congiuntivo: { io: "colga", tu: "colga", lui: "colga", noi: "cogliamo", voi: "cogliate", loro: "colgano" },
+    },
+    notes: { presente: "Comme scegliere : alternance 'gli' / 'lg'. Participe irrégulier : colto." },
+  },
+  {
+    infinitive: "spegnere", french: "éteindre", difficulty: "difficile", aux: "avere", participle: "spento",
+    gerund: "spegnendo",
+    conj: {
+      presente: { io: "spengo", tu: "spegni", lui: "spegne", noi: "spegniamo", voi: "spegnete", loro: "spengono" },
+      imperfetto: { io: "spegnevo", tu: "spegnevi", lui: "spegneva", noi: "spegnevamo", voi: "spegnevate", loro: "spegnevano" },
+      futuro: { io: "spegnerò", tu: "spegnerai", lui: "spegnerà", noi: "spegneremo", voi: "spegnerete", loro: "spegneranno" },
+      condizionale: { io: "spegnerei", tu: "spegneresti", lui: "spegnerebbe", noi: "spegneremmo", voi: "spegnereste", loro: "spegnerebbero" },
+      congiuntivo: { io: "spenga", tu: "spenga", lui: "spenga", noi: "spegniamo", voi: "spegniate", loro: "spengano" },
+    },
+    notes: { presente: "Alternance 'gn' / 'ng' : spegno / spengo. Participe irrégulier : spento." },
+  },
+  {
+    infinitive: "tacere", french: "se taire", difficulty: "difficile", aux: "avere", participle: "taciuto",
+    gerund: "tacendo",
+    conj: {
+      presente: { io: "taccio", tu: "taci", lui: "tace", noi: "tacciamo", voi: "tacete", loro: "tacciono" },
+      imperfetto: { io: "tacevo", tu: "tacevi", lui: "taceva", noi: "tacevamo", voi: "tacevate", loro: "tacevano" },
+      futuro: { io: "tacerò", tu: "tacerai", lui: "tacerà", noi: "taceremo", voi: "tacerete", loro: "taceranno" },
+      condizionale: { io: "tacerei", tu: "taceresti", lui: "tacerebbe", noi: "taceremmo", voi: "tacereste", loro: "tacerebbero" },
+      congiuntivo: { io: "taccia", tu: "taccia", lui: "taccia", noi: "tacciamo", voi: "tacciate", loro: "tacciano" },
+    },
+    notes: { presente: "Double 'c' à io et loro : taccio, tacciono." },
+  },
   // RÉFLÉCHIS / PRONOMINAUX
   reflexive("chiamarsi", "s'appeler", "chiam", "chiamato", "are",
     "Chiamarsi = 'mi chiamo Luca' (je m'appelle Luca). Le pronom précède toujours le verbe."),
@@ -475,6 +626,10 @@ const rawVerbs: Verb[] = [
   reflexive("sentirsi", "se sentir", "sent", "sentito", "ire"),
   reflexive("ricordarsi", "se souvenir", "ricord", "ricordato", "are"),
   reflexive("vestirsi", "s'habiller", "vest", "vestito", "ire"),
+  reflexive("pettinarsi", "se coiffer / se peigner", "pettin", "pettinato", "are"),
+  reflexive("addormentarsi", "s'endormir", "addorment", "addormentato", "are"),
+  reflexive("preoccuparsi", "s'inquiéter / se préoccuper", "preoccup", "preoccupato", "are"),
+  reflexive("fermarsi", "s'arrêter", "ferm", "fermato", "are"),
 ];
 
 // Fix the small typo above (extra space in venire noi form)
@@ -505,6 +660,18 @@ const IRREG_EXTRAS: Record<string, { imp?: { tu?: string; noi?: string; voi?: st
   rimanere:  { imp: { tu: "rimani",noi: "rimaniamo", voi: "rimanete" }, gerund: "rimanendo" },
   scegliere: { imp: { tu: "scegli",noi: "scegliamo", voi: "scegliete"}, gerund: "scegliendo" },
   porre:     { imp: { tu: "poni",  noi: "poniamo",   voi: "ponete"   }, gerund: "ponendo" },
+  vedere:    { imp: { tu: "vedi",  noi: "vediamo",   voi: "vedete"   }, gerund: "vedendo" },
+  prendere:  { imp: { tu: "prendi",noi: "prendiamo", voi: "prendete" }, gerund: "prendendo" },
+  mettere:   { imp: { tu: "metti", noi: "mettiamo",  voi: "mettete"  }, gerund: "mettendo" },
+  tenere:    { imp: { tu: "tieni", noi: "teniamo",   voi: "tenete"   }, gerund: "tenendo" },
+  salire:    { imp: { tu: "sali",  noi: "saliamo",   voi: "salite"   }, gerund: "salendo" },
+  morire:    { imp: { tu: "muori", noi: "moriamo",   voi: "morite"   }, gerund: "morendo" },
+  piacere:   { imp: { tu: "piaci", noi: "piacciamo", voi: "piacete"  }, gerund: "piacendo" },
+  tradurre:  { imp: { tu: "traduci",noi: "traduciamo",voi: "traducete"}, gerund: "traducendo" },
+  condurre:  { imp: { tu: "conduci",noi: "conduciamo",voi: "conducete"}, gerund: "conducendo" },
+  cogliere:  { imp: { tu: "cogli", noi: "cogliamo",  voi: "cogliete" }, gerund: "cogliendo" },
+  spegnere:  { imp: { tu: "spegni",noi: "spegniamo", voi: "spegnete" }, gerund: "spegnendo" },
+  tacere:    { imp: { tu: "taci",  noi: "tacciamo",  voi: "tacete"   }, gerund: "tacendo" },
 };
 function withExtras(v: Verb): Verb {
   const conj: Partial<Record<Tense, Partial<Record<Person, string>>>> = { ...v.conj };
@@ -559,4 +726,56 @@ export function displaySubject(person: Person, useAlias: boolean): string {
     return PERSON_LABEL[person];
   }
   return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// ---------- Regular reference (for irregular-highlighting in the dictionary) ---------
+export function regularReference(v: Verb): Partial<Record<Tense, Partial<Record<Person, string>>>> {
+  const inf = v.infinitive;
+  const isRefl = v.difficulty === "riflessivo";
+  const base = isRefl ? inf.slice(0, -2) + "e" : inf;
+  let raw: Record<Tense, Record<Person, string>> | null = null;
+  let stem = "";
+  if (base.endsWith("are")) { stem = base.slice(0, -3); raw = regAre(stem); }
+  else if (base.endsWith("ere")) { stem = base.slice(0, -3); raw = regEre(stem); }
+  else if (base.endsWith("ire")) { stem = base.slice(0, -3); raw = regIre(stem); }
+  else if (base.endsWith("rre")) { stem = base.slice(0, -3); raw = regEre(stem); }
+  if (!raw) return {};
+  const regPart = raw.participio.lui!;
+  if (isRefl) {
+    const refl = toReflexive(raw);
+    refl.passato_prossimo = reflexivePassato(regPart);
+    const gerund = base.endsWith("are") ? stem + "andosi" : stem + "endosi";
+    refl.gerundio = { io: "", tu: "", lui: gerund, noi: "", voi: "", loro: "" };
+    refl.participio = { io: "", tu: "", lui: regPart, noi: "", voi: "", loro: "" };
+    return refl;
+  }
+  raw.passato_prossimo = passato(v.aux, regPart);
+  return raw;
+}
+
+export type DiffPart = { text: string; bold: boolean };
+function simpleDiff(a: string, r: string): DiffPart[] {
+  if (a === r) return [{ text: a, bold: false }];
+  let p = 0;
+  while (p < a.length && p < r.length && a[p] === r[p]) p++;
+  let s = 0;
+  while (s < a.length - p && s < r.length - p && a[a.length - 1 - s] === r[r.length - 1 - s]) s++;
+  const parts: DiffPart[] = [];
+  if (p > 0) parts.push({ text: a.slice(0, p), bold: false });
+  if (a.length - p - s > 0) parts.push({ text: a.slice(p, a.length - s), bold: true });
+  if (s > 0) parts.push({ text: a.slice(a.length - s), bold: false });
+  return parts;
+}
+export function diffParts(actual: string, ref?: string): DiffPart[] {
+  if (!actual) return [];
+  if (!ref) return [{ text: actual, bold: true }];
+  const aw = actual.split(" ");
+  const rw = ref.split(" ");
+  if (aw.length !== rw.length) return simpleDiff(actual, ref);
+  const parts: DiffPart[] = [];
+  aw.forEach((word, i) => {
+    if (i > 0) parts.push({ text: " ", bold: false });
+    parts.push(...simpleDiff(word, rw[i]));
+  });
+  return parts;
 }

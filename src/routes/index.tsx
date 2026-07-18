@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { DIFFICULTIES, TENSES, type Difficulty, type Tense } from "@/lib/verbs";
 import { DEFAULT_CONFIG, loadConfig, saveConfig, type SessionConfig } from "@/lib/storage";
-import { Sparkles, PlayCircle } from "lucide-react";
+import { Sparkles, PlayCircle, BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -38,6 +38,7 @@ function Index() {
     <AppShell>
       <section className="relative mb-6 overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-[var(--shadow-soft)]">
         <div className="tricolore-bar absolute inset-x-0 top-0" />
+        <div className="absolute inset-y-0 left-0 w-1.5" style={{ background: "var(--tricolore-green)" }} />
         <p className="mt-2 font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Impariamo l'italiano</p>
         <h1 className="mt-2 font-display text-3xl font-black leading-tight italic text-foreground">La coniugazione,<br/><span className="text-primary">senza stress.</span></h1>
         <p className="mt-3 text-sm text-muted-foreground">Configure ta session, entraîne-toi, progresse.</p>
@@ -135,6 +136,10 @@ function Index() {
         Commencer la session
       </Button>
       {!canStart && <p className="mt-2 text-center text-xs text-muted-foreground">Sélectionne au moins un niveau et un temps.</p>}
+
+      <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full border-2 text-sm font-bold" style={{ borderColor: "var(--tricolore-green)", color: "var(--tricolore-green)" }}>
+        <Link to="/dictionary"><BookOpen className="mr-2 h-4 w-4" />Consulter la conjugaison d'un verbe</Link>
+      </Button>
     </AppShell>
   );
 }
