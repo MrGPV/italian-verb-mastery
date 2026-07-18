@@ -180,8 +180,25 @@ function reflexive(infinitive: string, french: string, stem: string, participle:
     regIre(stem);
   const conj = toReflexive(base);
   conj.passato_prossimo = reflexivePassato(participle);
+  // Reflexive imperative / participio / gerundio with enclitic pronouns
+  const impTu =
+    kind === "are" ? stem + "ati" :
+    kind === "ere" ? stem + "iti" :
+    kind === "ire-isc" ? stem + "isciti" :
+    stem + "iti";
+  const impNoi = stem + "iamoci";
+  const impVoi =
+    kind === "are" ? stem + "atevi" :
+    kind === "ere" ? stem + "etevi" :
+    stem + "itevi";
+  const gerund =
+    kind === "are" ? stem + "andosi" : stem + "endosi";
+  conj.imperativo = { tu: impTu, noi: impNoi, voi: impVoi } as any;
+  conj.participio = { lui: participle } as any;
+  conj.gerundio = { lui: gerund } as any;
   return {
     infinitive, french, difficulty: "riflessivo", aux: "essere", participle,
+    gerund,
     conj,
     notes: {
       presente: "Verbe pronominal : le pronom réfléchi (mi/ti/si/ci/vi/si) se place AVANT le verbe conjugué.",
@@ -463,10 +480,52 @@ const rawVerbs: Verb[] = [
 // Fix the small typo above (extra space in venire noi form)
 rawVerbs.forEach((v) => {
   const c = v.conj.presente;
-  if (c) for (const k of PERSONS) c[k] = c[k].trim().replace(/,$/, "");
+  if (c) for (const k of PERSONS) {
+    const val = c[k];
+    if (val) c[k] = val.trim().replace(/,$/, "");
+  }
 });
 
-export const VERBS: Verb[] = rawVerbs.map(withPassato);
+// Add imperativo (tu/noi/voi), participio and gerundio to irregular verbs.
+const IRREG_EXTRAS: Record<string, { imp?: { tu?: string; noi?: string; voi?: string }; gerund: string }> = {
+  essere:    { imp: { tu: "sii",   noi: "siamo",     voi: "siate"    }, gerund: "essendo" },
+  avere:     { imp: { tu: "abbi",  noi: "abbiamo",   voi: "abbiate"  }, gerund: "avendo" },
+  andare:    { imp: { tu: "va'",   noi: "andiamo",   voi: "andate"   }, gerund: "andando" },
+  fare:      { imp: { tu: "fa'",   noi: "facciamo",  voi: "fate"     }, gerund: "facendo" },
+  stare:     { imp: { tu: "sta'",  noi: "stiamo",    voi: "state"    }, gerund: "stando" },
+  dare:      { imp: { tu: "da'",   noi: "diamo",     voi: "date"     }, gerund: "dando" },
+  potere:    { gerund: "potendo" }, // défectif : pas d'impératif
+  volere:    { imp: { tu: "vogli", noi: "vogliamo",  voi: "vogliate" }, gerund: "volendo" },
+  dovere:    { gerund: "dovendo" },
+  sapere:    { imp: { tu: "sappi", noi: "sappiamo",  voi: "sappiate" }, gerund: "sapendo" },
+  venire:    { imp: { tu: "vieni", noi: "veniamo",   voi: "venite"   }, gerund: "venendo" },
+  dire:      { imp: { tu: "di'",   noi: "diciamo",   voi: "dite"     }, gerund: "dicendo" },
+  bere:      { imp: { tu: "bevi",  noi: "beviamo",   voi: "bevete"   }, gerund: "bevendo" },
+  uscire:    { imp: { tu: "esci",  noi: "usciamo",   voi: "uscite"   }, gerund: "uscendo" },
+  rimanere:  { imp: { tu: "rimani",noi: "rimaniamo", voi: "rimanete" }, gerund: "rimanendo" },
+  scegliere: { imp: { tu: "scegli",noi: "scegliamo", voi: "scegliete"}, gerund: "scegliendo" },
+  porre:     { imp: { tu: "poni",  noi: "poniamo",   voi: "ponete"   }, gerund: "ponendo" },
+};
+function withExtras(v: Verb): Verb {
+  const conj: Partial<Record<Tense, Partial<Record<Person, string>>>> = { ...v.conj };
+  // Reflexives already have their extras set by reflexive().
+  if (v.difficulty !== "riflessivo") {
+    if (!conj.participio || !conj.participio.lui) {
+      conj.participio = { lui: v.participle };
+    }
+    const gerund = v.gerund ?? IRREG_EXTRAS[v.infinitive]?.gerund;
+    if (gerund && (!conj.gerundio || !conj.gerundio.lui)) {
+      conj.gerundio = { lui: gerund };
+    }
+    const extras = IRREG_EXTRAS[v.infinitive];
+    if (extras?.imp && (!conj.imperativo || Object.values(conj.imperativo).every((x) => !x))) {
+      conj.imperativo = { tu: extras.imp.tu, noi: extras.imp.noi, voi: extras.imp.voi };
+    }
+  }
+  return { ...v, conj };
+}
+
+export const VERBS: Verb[] = rawVerbs.map(withPassato).map(withExtras);
 
 export function findVerb(inf: string): Verb | undefined {
   return VERBS.find((v) => v.infinitive === inf);
