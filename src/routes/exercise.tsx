@@ -61,10 +61,11 @@ function Exercise() {
     return (
       <AppShell>
         <Card className="animate-pop overflow-hidden">
-          <div className="p-6 text-center text-primary-foreground" style={{ background: "var(--gradient-hero)" }}>
-            <Trophy className="mx-auto h-12 w-12" />
-            <h2 className="mt-3 font-display text-3xl font-black">Bravissimo !</h2>
-            <p className="mt-1 italic opacity-90">Sessione completata</p>
+          <div className="tricolore-bar" />
+          <div className="p-6 text-center">
+            <Trophy className="mx-auto h-12 w-12 text-primary" />
+            <h2 className="mt-3 font-display text-3xl font-black italic text-foreground">Bravissimo !</h2>
+            <p className="mt-1 italic text-muted-foreground">Sessione completata</p>
           </div>
           <CardContent className="space-y-4 pt-6 text-center">
             <div className="text-5xl font-black text-foreground">{pct}%</div>
