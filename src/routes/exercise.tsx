@@ -133,11 +133,10 @@ function Exercise() {
       <Card className={`mb-4 overflow-hidden ${state === "checked" && !allCorrect ? "animate-shake" : ""} ${allCorrect ? "animate-pop" : ""}`}>
         <div className="tricolore-bar" />
         <CardContent className="pt-6">
-          <div className="mb-4 flex items-center justify-between text-xs">
-            <span className="rounded-full bg-primary/10 px-3 py-1 font-semibold uppercase tracking-wide text-primary">
-              {tenseLabel?.fr}
-            </span>
-            <span className="font-display italic text-muted-foreground">{tenseLabel?.it}</span>
+          <div className={`tense-chip tense-chip-lg tense-${item.tense} mb-5 w-full justify-center text-center shadow-sm`}>
+            <span className="font-display font-black">{tenseLabel?.fr}</span>
+            <span className="opacity-70">·</span>
+            <span className="font-display italic font-semibold normal-case tracking-normal">{tenseLabel?.it}</span>
           </div>
 
           <div className="mb-6 text-center">
