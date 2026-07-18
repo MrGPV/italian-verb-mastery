@@ -92,8 +92,8 @@
   --tricolore-green: oklch(0.6 0.17 148);
   --tricolore-white: oklch(0.99 0.005 90);
   --tricolore-red: oklch(0.55 0.22 25);
-  --gradient-hero: linear-gradient(115deg, oklch(0.6 0.17 148) 0%, oklch(0.94 0.03 90) 50%, oklch(0.55 0.22 25) 100%);
-  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0%, oklch(0.98 0.008 90) 50%, var(--tricolore-red) 100%);
+  --gradient-hero: linear-gradient(115deg, oklch(0.55 0.17 148) 0%, oklch(0.72 0.15 148) 32%, oklch(0.96 0.02 90) 55%, oklch(0.55 0.22 25) 100%);
+  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0%, var(--tricolore-green) 30%, oklch(0.98 0.008 90) 50%, var(--tricolore-red) 70%, var(--tricolore-red) 100%);
   --shadow-soft: 0 8px 30px -12px oklch(0.55 0.22 25 / 0.3);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -135,8 +135,8 @@
   --tricolore-green: oklch(0.65 0.17 148);
   --tricolore-white: oklch(0.94 0.01 85);
   --tricolore-red: oklch(0.66 0.22 25);
-  --gradient-hero: linear-gradient(115deg, oklch(0.62 0.17 148) 0%, oklch(0.9 0.02 85) 50%, oklch(0.66 0.22 25) 100%);
-  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0%, oklch(0.94 0.01 85) 50%, var(--tricolore-red) 100%);
+  --gradient-hero: linear-gradient(115deg, oklch(0.58 0.17 148) 0%, oklch(0.72 0.15 148) 32%, oklch(0.9 0.02 85) 55%, oklch(0.66 0.22 25) 100%);
+  --gradient-tricolore: linear-gradient(90deg, var(--tricolore-green) 0%, var(--tricolore-green) 30%, oklch(0.94 0.01 85) 50%, var(--tricolore-red) 70%, var(--tricolore-red) 100%);
   --shadow-soft: 0 4px 24px -8px oklch(0 0 0 / 0.5);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -190,3 +190,49 @@
   width: 100%;
   background: var(--gradient-tricolore);
 }
+
+/* Green side accent for cards / hero */
+@utility italian-accent {
+  position: relative;
+}
+@utility italian-accent-left {
+  border-left: 4px solid var(--tricolore-green);
+}
+
+/* Per-tense chip colors — soft in light, muted-dark in dark */
+.tense-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.tense-chip-lg {
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 1rem;
+  letter-spacing: 0.04em;
+}
+.tense-presente         { background-color: oklch(0.93 0.09 148); color: oklch(0.32 0.14 148); }
+.tense-passato_prossimo { background-color: oklch(0.94 0.07 25);  color: oklch(0.4  0.18 25); }
+.tense-imperfetto       { background-color: oklch(0.94 0.1  75);  color: oklch(0.4  0.15 75); }
+.tense-futuro           { background-color: oklch(0.92 0.08 230); color: oklch(0.35 0.16 230); }
+.tense-condizionale     { background-color: oklch(0.92 0.08 310); color: oklch(0.35 0.16 310); }
+.tense-congiuntivo      { background-color: oklch(0.92 0.09 195); color: oklch(0.32 0.13 195); }
+.tense-imperativo       { background-color: oklch(0.93 0.11 55);  color: oklch(0.38 0.17 55); }
+.tense-participio       { background-color: oklch(0.93 0.08 340); color: oklch(0.38 0.16 340); }
+.tense-gerundio         { background-color: oklch(0.92 0.08 265); color: oklch(0.35 0.16 265); }
+
+.dark .tense-presente         { background-color: oklch(0.3  0.09 148); color: oklch(0.88 0.14 148); }
+.dark .tense-passato_prossimo { background-color: oklch(0.32 0.08 25);  color: oklch(0.9  0.16 25); }
+.dark .tense-imperfetto       { background-color: oklch(0.32 0.08 75);  color: oklch(0.9  0.14 75); }
+.dark .tense-futuro           { background-color: oklch(0.3  0.08 230); color: oklch(0.88 0.14 230); }
+.dark .tense-condizionale     { background-color: oklch(0.3  0.08 310); color: oklch(0.88 0.14 310); }
+.dark .tense-congiuntivo      { background-color: oklch(0.3  0.08 195); color: oklch(0.88 0.13 195); }
+.dark .tense-imperativo       { background-color: oklch(0.32 0.1  55);  color: oklch(0.9  0.16 55); }
+.dark .tense-participio       { background-color: oklch(0.3  0.08 340); color: oklch(0.88 0.14 340); }
+.dark .tense-gerundio         { background-color: oklch(0.3  0.08 265); color: oklch(0.88 0.14 265); }
