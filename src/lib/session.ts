@@ -38,6 +38,14 @@ function verbWeight(v: Verb, stats: StatsMap): number {
   return 1 + failRate * 5 + Math.min(daysSince, 7) * 0.3;
 }
 
+const SINGLE_FORM: Tense[] = ["participio", "gerundio"];
+
+function subjectFor(tense: Tense, person: Person, useAlias: boolean): string {
+  if (SINGLE_FORM.includes(tense)) return "→";
+  if (tense === "imperativo") return person + " !";
+  return displaySubject(person, useAlias);
+}
+
 export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
   const pool = VERBS.filter(
     (v) => config.difficulties.includes(v.difficulty) && config.tenses.some((t) => v.conj[t]),
@@ -51,24 +59,26 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
     const availTenses = config.tenses.filter((t) => verb.conj[t]);
     if (availTenses.length === 0) { i--; continue; }
     const tense = availTenses[Math.floor(Math.random() * availTenses.length)];
+    const row = verb.conj[tense]!;
+    const availPersons = PERSONS.filter((p) => row[p]);
+    if (availPersons.length === 0) { i--; continue; }
 
     if (config.mode === "complet") {
-      const useAlias = Math.random() < 0.25;
+      const useAlias = Math.random() < 0.15;
       const questions: Question[] = [];
-      for (const p of PERSONS) {
-        const ans = verb.conj[tense]?.[p];
+      for (const p of availPersons) {
+        const ans = row[p];
         if (!ans) continue;
-        questions.push({ verb, tense, person: p, subject: displaySubject(p, useAlias), answer: ans });
+        questions.push({ verb, tense, person: p, subject: subjectFor(tense, p, useAlias), answer: ans });
       }
       if (questions.length === 0) { i--; continue; }
       items.push({ kind: "complet", verb, tense, questions });
     } else {
-      const person = PERSONS[Math.floor(Math.random() * PERSONS.length)];
-      const ans = verb.conj[tense]?.[person];
-      if (!ans) { i--; continue; }
+      const person = availPersons[Math.floor(Math.random() * availPersons.length)];
+      const ans = row[person]!;
       items.push({
         kind: "mixte", verb, tense,
-        questions: [{ verb, tense, person, subject: displaySubject(person, Math.random() < 0.35), answer: ans }],
+        questions: [{ verb, tense, person, subject: subjectFor(tense, person, Math.random() < 0.2), answer: ans }],
       });
     }
   }
