@@ -543,13 +543,20 @@ export const TU_ALIASES: string[] = [];
 export const IO_ALIASES: string[] = [];
 
 export function displaySubject(person: Person, useAlias: boolean): string {
-  if (!useAlias) return PERSON_LABEL[person];
+  if (!useAlias) {
+    // 3ème pers. singulier : alterne "lui" / "lei" (jamais "lui/lei")
+    if (person === "lui") return Math.random() < 0.5 ? "lui" : "lei";
+    return PERSON_LABEL[person];
+  }
   const pool =
     person === "lui" ? SUBJECT_ALIASES.lui
     : person === "loro" ? SUBJECT_ALIASES.loro
     : person === "noi" ? NOI_ALIASES
     : person === "voi" ? VOI_ALIASES
     : [];
-  if (pool.length === 0) return PERSON_LABEL[person];
+  if (pool.length === 0) {
+    if (person === "lui") return Math.random() < 0.5 ? "lui" : "lei";
+    return PERSON_LABEL[person];
+  }
   return pool[Math.floor(Math.random() * pool.length)];
 }
