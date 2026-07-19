@@ -218,6 +218,7 @@
   letter-spacing: 0.04em;
 }
 .tense-presente         { background-color: oklch(0.93 0.09 148); color: oklch(0.32 0.14 148); }
+.tense-presente_progressivo { background-color: oklch(0.93 0.09 170); color: oklch(0.32 0.14 170); }
 .tense-passato_prossimo { background-color: oklch(0.94 0.07 25);  color: oklch(0.4  0.18 25); }
 .tense-imperfetto       { background-color: oklch(0.94 0.1  75);  color: oklch(0.4  0.15 75); }
 .tense-futuro           { background-color: oklch(0.92 0.08 230); color: oklch(0.35 0.16 230); }
@@ -228,6 +229,7 @@
 .tense-gerundio         { background-color: oklch(0.92 0.08 265); color: oklch(0.35 0.16 265); }
 
 .dark .tense-presente         { background-color: oklch(0.3  0.09 148); color: oklch(0.88 0.14 148); }
+.dark .tense-presente_progressivo { background-color: oklch(0.3  0.09 170); color: oklch(0.88 0.14 170); }
 .dark .tense-passato_prossimo { background-color: oklch(0.32 0.08 25);  color: oklch(0.9  0.16 25); }
 .dark .tense-imperfetto       { background-color: oklch(0.32 0.08 75);  color: oklch(0.9  0.14 75); }
 .dark .tense-futuro           { background-color: oklch(0.3  0.08 230); color: oklch(0.88 0.14 230); }
