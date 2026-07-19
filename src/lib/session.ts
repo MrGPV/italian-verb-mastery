@@ -151,3 +151,25 @@ export function normalize(s: string): string {
 export function isCorrect(input: string, answer: string): boolean {
   return normalize(input) === normalize(answer);
 }
+
+export function isCorrectQ(input: string, q: Question): boolean {
+  const n = normalize(input);
+  if (n === normalize(q.answer)) return true;
+  return (q.alternates ?? []).some((a) => normalize(a) === n);
+}
+
+// Best reference answer to display for diff highlighting on error.
+export function bestReference(input: string, q: Question): string {
+  const all = [q.answer, ...(q.alternates ?? [])];
+  if (all.length <= 1) return q.answer;
+  const n = normalize(input);
+  let best = all[0], bestScore = -1;
+  for (const a of all) {
+    const na = normalize(a);
+    let s = 0;
+    const min = Math.min(n.length, na.length);
+    for (let i = 0; i < min; i++) if (n[i] === na[i]) s++;
+    if (s > bestScore) { bestScore = s; best = a; }
+  }
+  return best;
+}
