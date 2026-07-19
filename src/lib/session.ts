@@ -10,6 +10,11 @@ export interface Question {
   person: Person;
   subject: string; // displayed subject
   answer: string;
+  // Translation exercises (tense === "infinitivo")
+  prompt?: string;          // word to display instead of the italian infinitive
+  hideFrench?: boolean;     // hide the french translation subtitle
+  alternates?: string[];    // additional accepted answers
+  directionLabel?: string;  // "→ Traduis en italien" / "→ Traduis en français"
 }
 
 // A session item = one exercise counted in the volume.
@@ -50,6 +55,32 @@ function subjectFor(tense: Tense, person: Person, useAlias: boolean, needsGender
   return { text: info.text, info };
 }
 
+function splitFrench(fr: string): string[] {
+  return fr.split(/[\/,;]/).map((s) => s.trim()).filter(Boolean);
+}
+
+function buildInfinitivoQuestion(verb: Verb): Question {
+  const it2fr = Math.random() < 0.5;
+  if (it2fr) {
+    const alts = splitFrench(verb.french);
+    return {
+      verb, tense: "infinitivo", person: "lui", subject: "→ français",
+      prompt: verb.infinitive,
+      hideFrench: true,
+      answer: alts[0] ?? verb.french,
+      alternates: alts.slice(1),
+      directionLabel: "Traduis en français",
+    };
+  }
+  return {
+    verb, tense: "infinitivo", person: "lui", subject: "→ italiano",
+    prompt: verb.french,
+    hideFrench: true,
+    answer: verb.infinitive,
+    directionLabel: "Traduis en italien",
+  };
+}
+
 export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
   const pool = VERBS.filter(
     (v) => config.difficulties.includes(v.difficulty) && config.tenses.some((t) => v.conj[t]),
@@ -61,10 +92,18 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
   for (let i = 0; i < config.count; i++) {
     const weights = pool.map((v) => (config.smart ? verbWeight(v, stats) : 1));
     const verb = pickWeighted(pool, weights);
-    // presente_progressivo is generated dynamically and always available
-    const availTenses = allTenses.filter((t) => t === "presente_progressivo" || verb.conj[t]);
+    // presente_progressivo & infinitivo are generated dynamically and always available
+    const availTenses = allTenses.filter(
+      (t) => t === "presente_progressivo" || t === "infinitivo" || verb.conj[t],
+    );
     if (availTenses.length === 0) { i--; continue; }
     const tense = availTenses[Math.floor(Math.random() * availTenses.length)];
+
+    if (tense === "infinitivo") {
+      items.push({ kind: "mixte", verb, tense, questions: [buildInfinitivoQuestion(verb)] });
+      continue;
+    }
+
     let availPersons: Person[];
     if (tense === "presente_progressivo") {
       availPersons = [...PERSONS];
@@ -74,10 +113,10 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
     }
     if (availPersons.length === 0) { i--; continue; }
 
-    // For passato_prossimo with essere or reflexive verbs, gender matters
-    // → prefer concrete aliases; when using pronouns, show gender hint.
-    const needsAgreement =
-      tense === "passato_prossimo" && (verb.aux === "essere" || verb.difficulty === "riflessivo");
+    // For all passato_prossimo exercises: give a gender hint (forces the
+    // student to reason about which auxiliary and whether the participle
+    // must agree). For essere/reflexive it also drives agreement.
+    const needsAgreement = tense === "passato_prossimo";
 
     if (config.mode === "complet") {
       const useAlias = needsAgreement ? Math.random() < 0.6 : Math.random() < 0.15;
