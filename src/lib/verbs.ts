@@ -14,6 +14,7 @@ export const PERSON_LABEL: Record<Person, string> = {
 
 export type Tense =
   | "presente"
+  | "presente_progressivo"
   | "passato_prossimo"
   | "imperfetto"
   | "futuro"
@@ -25,6 +26,7 @@ export type Tense =
 
 export const TENSES: { id: Tense; fr: string; it: string }[] = [
   { id: "presente", fr: "Présent", it: "Presente" },
+  { id: "presente_progressivo", fr: "Présent progressif", it: "Presente progressivo" },
   { id: "passato_prossimo", fr: "Passé composé", it: "Passato prossimo" },
   { id: "imperfetto", fr: "Imparfait", it: "Imperfetto" },
   { id: "futuro", fr: "Futur", it: "Futuro semplice" },
@@ -35,12 +37,11 @@ export const TENSES: { id: Tense; fr: string; it: string }[] = [
   { id: "gerundio", fr: "Gérondif", it: "Gerundio presente" },
 ];
 
-export type Difficulty = "courant" | "regulier" | "irregulier" | "difficile" | "riflessivo";
+export type Difficulty = "courant" | "regulier" | "irregulier" | "riflessivo";
 export const DIFFICULTIES: { id: Difficulty; label: string }[] = [
   { id: "courant", label: "Les plus courants" },
   { id: "regulier", label: "Réguliers" },
   { id: "irregulier", label: "Exceptions / Irréguliers" },
-  { id: "difficile", label: "Difficiles" },
   { id: "riflessivo", label: "Réfléchis / Pronominaux" },
 ];
 
@@ -56,7 +57,8 @@ export interface Verb {
 }
 
 // Helpers to generate regular -are/-ere/-ire conjugations
-function regAre(stem: string): Record<Tense, Record<Person, string>> {
+type RegularConj = Partial<Record<Tense, Record<Person, string>>>;
+function regAre(stem: string): RegularConj {
   return {
     presente: { io: stem + "o", tu: stem + "i", lui: stem + "a", noi: stem + "iamo", voi: stem + "ate", loro: stem + "ano" },
     imperfetto: { io: stem + "avo", tu: stem + "avi", lui: stem + "ava", noi: stem + "avamo", voi: stem + "avate", loro: stem + "avano" },
@@ -69,7 +71,7 @@ function regAre(stem: string): Record<Tense, Record<Person, string>> {
     gerundio: { io: "", tu: "", lui: stem + "ando", noi: "", voi: "", loro: "" },
   };
 }
-function regEre(stem: string): Record<Tense, Record<Person, string>> {
+function regEre(stem: string): RegularConj {
   return {
     presente: { io: stem + "o", tu: stem + "i", lui: stem + "e", noi: stem + "iamo", voi: stem + "ete", loro: stem + "ono" },
     imperfetto: { io: stem + "evo", tu: stem + "evi", lui: stem + "eva", noi: stem + "evamo", voi: stem + "evate", loro: stem + "evano" },
@@ -82,7 +84,7 @@ function regEre(stem: string): Record<Tense, Record<Person, string>> {
     gerundio: { io: "", tu: "", lui: stem + "endo", noi: "", voi: "", loro: "" },
   };
 }
-function regIre(stem: string, isc = false): Record<Tense, Record<Person, string>> {
+function regIre(stem: string, isc = false): RegularConj {
   const pres = isc
     ? { io: stem + "isco", tu: stem + "isci", lui: stem + "isce", noi: stem + "iamo", voi: stem + "ite", loro: stem + "iscono" }
     : { io: stem + "o", tu: stem + "i", lui: stem + "e", noi: stem + "iamo", voi: stem + "ite", loro: stem + "ono" };
@@ -144,8 +146,8 @@ function withPassato(v: Verb): Verb {
 const REFL_PRONOUNS: Record<Person, string> = {
   io: "mi", tu: "ti", lui: "si", noi: "ci", voi: "vi", loro: "si",
 };
-function toReflexive(conj: Record<Tense, Record<Person, string>>): Record<Tense, Record<Person, string>> {
-  const out = {} as Record<Tense, Record<Person, string>>;
+function toReflexive(conj: RegularConj): RegularConj {
+  const out: RegularConj = {};
   (Object.keys(conj) as Tense[]).forEach((t) => {
     const row = conj[t];
     if (!row || Object.keys(row).length === 0) return;
@@ -496,7 +498,7 @@ const rawVerbs: Verb[] = [
   },
   // DIFFICILES
   {
-    infinitive: "bere", french: "boire", difficulty: "difficile", aux: "avere", participle: "bevuto",
+    infinitive: "bere", french: "boire", difficulty: "irregulier", aux: "avere", participle: "bevuto",
     conj: {
       presente: { io: "bevo", tu: "bevi", lui: "beve", noi: "beviamo", voi: "bevete", loro: "bevono" },
       imperfetto: { io: "bevevo", tu: "bevevi", lui: "beveva", noi: "bevevamo", voi: "bevevate", loro: "bevevano" },
@@ -507,7 +509,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Bere garde le radical latin 'bev-' au présent et à l'imparfait, mais 'ber-' au futur/conditionnel (avec double 'r')." },
   },
   {
-    infinitive: "uscire", french: "sortir", difficulty: "difficile", aux: "essere", participle: "uscito",
+    infinitive: "uscire", french: "sortir", difficulty: "irregulier", aux: "essere", participle: "uscito",
     conj: {
       presente: { io: "esco", tu: "esci", lui: "esce", noi: "usciamo", voi: "uscite", loro: "escono" },
       imperfetto: { io: "uscivo", tu: "uscivi", lui: "usciva", noi: "uscivamo", voi: "uscivate", loro: "uscivano" },
@@ -518,7 +520,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Uscire change 'u' en 'e' aux personnes fortes : esco, esci, esce, escono — mais usciamo et uscite gardent le 'u'." },
   },
   {
-    infinitive: "rimanere", french: "rester", difficulty: "difficile", aux: "essere", participle: "rimasto",
+    infinitive: "rimanere", french: "rester", difficulty: "irregulier", aux: "essere", participle: "rimasto",
     conj: {
       presente: { io: "rimango", tu: "rimani", lui: "rimane", noi: "rimaniamo", voi: "rimanete", loro: "rimangono" },
       imperfetto: { io: "rimanevo", tu: "rimanevi", lui: "rimaneva", noi: "rimanevamo", voi: "rimanevate", loro: "rimanevano" },
@@ -532,7 +534,7 @@ const rawVerbs: Verb[] = [
     },
   },
   {
-    infinitive: "scegliere", french: "choisir", difficulty: "difficile", aux: "avere", participle: "scelto",
+    infinitive: "scegliere", french: "choisir", difficulty: "irregulier", aux: "avere", participle: "scelto",
     conj: {
       presente: { io: "scelgo", tu: "scegli", lui: "sceglie", noi: "scegliamo", voi: "scegliete", loro: "scelgono" },
       imperfetto: { io: "sceglievo", tu: "sceglievi", lui: "sceglieva", noi: "sceglievamo", voi: "sceglievate", loro: "sceglievano" },
@@ -545,7 +547,7 @@ const rawVerbs: Verb[] = [
     },
   },
   {
-    infinitive: "porre", french: "poser / placer", difficulty: "difficile", aux: "avere", participle: "posto",
+    infinitive: "porre", french: "poser / placer", difficulty: "irregulier", aux: "avere", participle: "posto",
     conj: {
       presente: { io: "pongo", tu: "poni", lui: "pone", noi: "poniamo", voi: "ponete", loro: "pongono" },
       imperfetto: { io: "ponevo", tu: "ponevi", lui: "poneva", noi: "ponevamo", voi: "ponevate", loro: "ponevano" },
@@ -556,7 +558,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Porre vient du latin 'ponere' : radical 'pon-' partout. Modèle pour comporre, proporre, supporre." },
   },
   {
-    infinitive: "tradurre", french: "traduire", difficulty: "difficile", aux: "avere", participle: "tradotto",
+    infinitive: "tradurre", french: "traduire", difficulty: "irregulier", aux: "avere", participle: "tradotto",
     gerund: "traducendo",
     conj: {
       presente: { io: "traduco", tu: "traduci", lui: "traduce", noi: "traduciamo", voi: "traducete", loro: "traducono" },
@@ -568,7 +570,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Du latin 'traducere' : radical 'traduc-'. Futur avec double 'r' : tradurrò. Participe : tradotto." },
   },
   {
-    infinitive: "condurre", french: "conduire / mener", difficulty: "difficile", aux: "avere", participle: "condotto",
+    infinitive: "condurre", french: "conduire / mener", difficulty: "irregulier", aux: "avere", participle: "condotto",
     gerund: "conducendo",
     conj: {
       presente: { io: "conduco", tu: "conduci", lui: "conduce", noi: "conduciamo", voi: "conducete", loro: "conducono" },
@@ -580,7 +582,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Même modèle que tradurre : radical 'conduc-', participe 'condotto'." },
   },
   {
-    infinitive: "cogliere", french: "cueillir / saisir", difficulty: "difficile", aux: "avere", participle: "colto",
+    infinitive: "cogliere", french: "cueillir / saisir", difficulty: "irregulier", aux: "avere", participle: "colto",
     gerund: "cogliendo",
     conj: {
       presente: { io: "colgo", tu: "cogli", lui: "coglie", noi: "cogliamo", voi: "cogliete", loro: "colgono" },
@@ -592,7 +594,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Comme scegliere : alternance 'gli' / 'lg'. Participe irrégulier : colto." },
   },
   {
-    infinitive: "spegnere", french: "éteindre", difficulty: "difficile", aux: "avere", participle: "spento",
+    infinitive: "spegnere", french: "éteindre", difficulty: "irregulier", aux: "avere", participle: "spento",
     gerund: "spegnendo",
     conj: {
       presente: { io: "spengo", tu: "spegni", lui: "spegne", noi: "spegniamo", voi: "spegnete", loro: "spengono" },
@@ -604,7 +606,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Alternance 'gn' / 'ng' : spegno / spengo. Participe irrégulier : spento." },
   },
   {
-    infinitive: "tacere", french: "se taire", difficulty: "difficile", aux: "avere", participle: "taciuto",
+    infinitive: "tacere", french: "se taire", difficulty: "irregulier", aux: "avere", participle: "taciuto",
     gerund: "tacendo",
     conj: {
       presente: { io: "taccio", tu: "taci", lui: "tace", noi: "tacciamo", voi: "tacete", loro: "tacciono" },
@@ -698,34 +700,114 @@ export function findVerb(inf: string): Verb | undefined {
   return VERBS.find((v) => v.infinitive === inf);
 }
 
-// Real-subject alternatives for lui / loro slots to spice up questions
-export const SUBJECT_ALIASES: Record<"lui" | "loro", string[]> = {
-  lui: ["Luca", "Daniela", "Il gatto", "Mio padre", "La ragazza", "Marco"],
-  loro: ["Luca e Marco", "Le ragazze", "Gli alberi", "I miei amici", "Daniela e Angela", "tu ed io"],
-};
-// "tu ed io" is a "noi" subject; keep it separate for noi
-export const NOI_ALIASES = ["tu ed io", "io e Marco", "noi due"];
-export const VOI_ALIASES = ["tu e Luca", "voi ragazzi", "tu ed Angela"];
-export const TU_ALIASES: string[] = [];
-export const IO_ALIASES: string[] = [];
+// ---------- Subject with gender / number metadata -------------------------
+export type Gender = "m" | "f";
+export type Numerus = "s" | "p";
+export interface SubjectInfo {
+  text: string;
+  person: Person;
+  gender: Gender;
+  number: Numerus;
+}
+type Alias = { text: string; gender: Gender };
+const LUI_ALIASES: Alias[] = [
+  { text: "Luca", gender: "m" }, { text: "Marco", gender: "m" },
+  { text: "Mio padre", gender: "m" }, { text: "Il gatto", gender: "m" },
+  { text: "Daniela", gender: "f" }, { text: "La ragazza", gender: "f" },
+  { text: "Mia sorella", gender: "f" },
+];
+const LORO_ALIASES: Alias[] = [
+  { text: "Luca e Marco", gender: "m" }, { text: "Gli alberi", gender: "m" },
+  { text: "I miei amici", gender: "m" },
+  { text: "Le ragazze", gender: "f" }, { text: "Daniela e Angela", gender: "f" },
+];
+const NOI_ALIASES: Alias[] = [
+  { text: "tu ed io", gender: "m" }, { text: "io e Marco", gender: "m" },
+  { text: "Angela ed io", gender: "f" },
+];
+const VOI_ALIASES: Alias[] = [
+  { text: "tu e Luca", gender: "m" }, { text: "voi ragazzi", gender: "m" },
+  { text: "tu ed Angela", gender: "f" }, { text: "voi ragazze", gender: "f" },
+];
 
-export function displaySubject(person: Person, useAlias: boolean): string {
-  if (!useAlias) {
-    // 3ème pers. singulier : alterne "lui" / "lei" (jamais "lui/lei")
-    if (person === "lui") return Math.random() < 0.5 ? "lui" : "lei";
-    return PERSON_LABEL[person];
-  }
+function pick<T>(a: T[]): T { return a[Math.floor(Math.random() * a.length)]; }
+
+export function displaySubjectInfo(
+  person: Person,
+  useAlias: boolean,
+  needsGender = false,
+): SubjectInfo {
   const pool =
-    person === "lui" ? SUBJECT_ALIASES.lui
-    : person === "loro" ? SUBJECT_ALIASES.loro
-    : person === "noi" ? NOI_ALIASES
-    : person === "voi" ? VOI_ALIASES
-    : [];
-  if (pool.length === 0) {
-    if (person === "lui") return Math.random() < 0.5 ? "lui" : "lei";
-    return PERSON_LABEL[person];
+    person === "lui" ? LUI_ALIASES :
+    person === "loro" ? LORO_ALIASES :
+    person === "noi" ? NOI_ALIASES :
+    person === "voi" ? VOI_ALIASES : [];
+
+  if (useAlias && pool.length > 0) {
+    const a = pick(pool);
+    return { text: a.text, person, gender: a.gender, number: person === "loro" || person === "noi" || person === "voi" ? "p" : "s" };
   }
-  return pool[Math.floor(Math.random() * pool.length)];
+  // Pronoun form
+  const gender: Gender = Math.random() < 0.5 ? "m" : "f";
+  if (person === "lui") return { text: gender === "m" ? "lui" : "lei", person, gender, number: "s" };
+  const num: Numerus = person === "io" || person === "tu" ? "s" : "p";
+  const label = PERSON_LABEL[person];
+  const text = needsGender ? `${label} (${gender === "m" ? "m." : "f."})` : label;
+  return { text, person, gender, number: num };
+}
+
+// Kept for backward compat (dictionary etc.)
+export function displaySubject(person: Person, useAlias: boolean): string {
+  return displaySubjectInfo(person, useAlias).text;
+}
+
+// ---------- Agreement + dynamic answer generation ------------------------
+export function agreeParticiple(part: string, g: Gender, n: Numerus): string {
+  const target = n === "s" ? (g === "f" ? "a" : "o") : (g === "f" ? "e" : "i");
+  return part.replace(/[aoei]$/, target);
+}
+
+const STARE_PRES: Record<Person, string> = {
+  io: "sto", tu: "stai", lui: "sta", noi: "stiamo", voi: "state", loro: "stanno",
+};
+
+export function getGerundBase(v: Verb): string {
+  if (v.gerund) return v.gerund;
+  const g = v.conj.gerundio?.lui;
+  if (g) return v.difficulty === "riflessivo" ? g.replace(/si$/, "") : g;
+  // fallback from infinitive
+  const inf = v.difficulty === "riflessivo" ? v.infinitive.replace(/rsi$/, "re") : v.infinitive;
+  if (inf.endsWith("are")) return inf.slice(0, -3) + "ando";
+  return inf.slice(0, -3) + "endo";
+}
+
+export function computeAnswer(verb: Verb, tense: Tense, subj: SubjectInfo): string {
+  const p = subj.person;
+
+  if (tense === "presente_progressivo") {
+    const base = getGerundBase(verb);
+    const stare = STARE_PRES[p];
+    if (verb.difficulty === "riflessivo") {
+      return `${REFL_PRONOUNS[p]} ${stare} ${base}`;
+    }
+    return `${stare} ${base}`;
+  }
+
+  if (tense === "passato_prossimo") {
+    if (verb.difficulty === "riflessivo") {
+      const part = agreeParticiple(verb.participle, subj.gender, subj.number);
+      const aux = essere_pres[p];
+      return `${REFL_PRONOUNS[p]} ${aux} ${part}`;
+    }
+    if (verb.aux === "essere") {
+      const part = agreeParticiple(verb.participle, subj.gender, subj.number);
+      return `${essere_pres[p]} ${part}`;
+    }
+    // avere: no agreement with subject
+    return `${avere_pres[p]} ${verb.participle}`;
+  }
+
+  return verb.conj[tense]?.[p] ?? "";
 }
 
 // ---------- Regular reference (for irregular-highlighting in the dictionary) ---------
@@ -733,14 +815,14 @@ export function regularReference(v: Verb): Partial<Record<Tense, Partial<Record<
   const inf = v.infinitive;
   const isRefl = v.difficulty === "riflessivo";
   const base = isRefl ? inf.slice(0, -2) + "e" : inf;
-  let raw: Record<Tense, Record<Person, string>> | null = null;
+  let raw: RegularConj | null = null;
   let stem = "";
   if (base.endsWith("are")) { stem = base.slice(0, -3); raw = regAre(stem); }
   else if (base.endsWith("ere")) { stem = base.slice(0, -3); raw = regEre(stem); }
   else if (base.endsWith("ire")) { stem = base.slice(0, -3); raw = regIre(stem); }
   else if (base.endsWith("rre")) { stem = base.slice(0, -3); raw = regEre(stem); }
   if (!raw) return {};
-  const regPart = raw.participio.lui!;
+  const regPart = raw.participio!.lui!;
   if (isRefl) {
     const refl = toReflexive(raw);
     refl.passato_prossimo = reflexivePassato(regPart);

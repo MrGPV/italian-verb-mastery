@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
 import {
-  VERBS, TENSES, PERSONS, PERSON_LABEL,
-  regularReference, diffParts,
+  VERBS, TENSES, PERSON_LABEL,
+  regularReference, diffParts, computeAnswer, displaySubjectInfo,
   type Verb, type Tense, type Person,
 } from "@/lib/verbs";
 
@@ -106,6 +106,18 @@ function personLabel(t: Tense, p: Person): string {
   return PERSON_LABEL[p];
 }
 
+const PERSON_ORDER_2COL: Person[] = ["io", "noi", "tu", "voi", "lui", "loro"];
+
+function progressivoRow(verb: Verb): Record<Person, string> {
+  const out = {} as Record<Person, string>;
+  (["io","tu","lui","noi","voi","loro"] as Person[]).forEach((p) => {
+    // Use masculine singular/plural as canonical display
+    const info = displaySubjectInfo(p, false);
+    out[p] = computeAnswer(verb, "presente_progressivo", { ...info, gender: "m" });
+  });
+  return out;
+}
+
 function VerbFullConj({ verb }: { verb: Verb }) {
   const ref = useMemo(() => regularReference(verb), [verb]);
   return (
@@ -122,9 +134,9 @@ function VerbFullConj({ verb }: { verb: Verb }) {
         </div>
 
         {TENSES.map((t) => {
-          const row = verb.conj[t.id];
+          const row = t.id === "presente_progressivo" ? progressivoRow(verb) : verb.conj[t.id];
           if (!row || Object.values(row).every((x) => !x)) return null;
-          const refRow = ref[t.id];
+          const refRow = t.id === "presente_progressivo" ? undefined : ref[t.id];
           return (
             <div key={t.id}>
               <div className={`tense-chip tense-${t.id} mb-3`}>
@@ -132,9 +144,9 @@ function VerbFullConj({ verb }: { verb: Verb }) {
                 <span className="opacity-70">·</span>
                 <span className="font-display italic normal-case tracking-normal">{t.it}</span>
               </div>
-              <div className="grid grid-cols-1 gap-y-1 gap-x-4 text-sm sm:grid-cols-2">
-                {PERSONS.map((p) => {
-                  const val = row[p];
+              <div className="grid grid-cols-2 gap-y-1 gap-x-4 text-sm">
+                {PERSON_ORDER_2COL.map((p) => {
+                  const val = (row as Partial<Record<Person, string>>)[p];
                   if (!val) return null;
                   const parts = diffParts(val, refRow?.[p]);
                   return (
