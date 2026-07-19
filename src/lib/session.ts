@@ -1,4 +1,7 @@
-import { PERSONS, VERBS, type Person, type Tense, type Verb, displaySubject } from "./verbs";
+import {
+  PERSONS, VERBS, computeAnswer, displaySubjectInfo,
+  type Person, type Tense, type Verb,
+} from "./verbs";
 import type { SessionConfig, StatsMap } from "./storage";
 
 export interface Question {
@@ -40,10 +43,11 @@ function verbWeight(v: Verb, stats: StatsMap): number {
 
 const SINGLE_FORM: Tense[] = ["participio", "gerundio"];
 
-function subjectFor(tense: Tense, person: Person, useAlias: boolean): string {
-  if (SINGLE_FORM.includes(tense)) return "→";
-  if (tense === "imperativo") return person + " !";
-  return displaySubject(person, useAlias);
+function subjectFor(tense: Tense, person: Person, useAlias: boolean, needsGender: boolean): { text: string; info: ReturnType<typeof displaySubjectInfo> } {
+  const info = displaySubjectInfo(person, useAlias, needsGender);
+  if (SINGLE_FORM.includes(tense)) return { text: "→", info };
+  if (tense === "imperativo") return { text: person + " !", info };
+  return { text: info.text, info };
 }
 
 export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
@@ -51,34 +55,50 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
     (v) => config.difficulties.includes(v.difficulty) && config.tenses.some((t) => v.conj[t]),
   );
   if (pool.length === 0 || config.tenses.length === 0) return [];
+  const allTenses: Tense[] = config.tenses.slice();
 
   const items: Item[] = [];
   for (let i = 0; i < config.count; i++) {
     const weights = pool.map((v) => (config.smart ? verbWeight(v, stats) : 1));
     const verb = pickWeighted(pool, weights);
-    const availTenses = config.tenses.filter((t) => verb.conj[t]);
+    // presente_progressivo is generated dynamically and always available
+    const availTenses = allTenses.filter((t) => t === "presente_progressivo" || verb.conj[t]);
     if (availTenses.length === 0) { i--; continue; }
     const tense = availTenses[Math.floor(Math.random() * availTenses.length)];
-    const row = verb.conj[tense]!;
-    const availPersons = PERSONS.filter((p) => row[p]);
+    let availPersons: Person[];
+    if (tense === "presente_progressivo") {
+      availPersons = [...PERSONS];
+    } else {
+      const row = verb.conj[tense]!;
+      availPersons = PERSONS.filter((p) => row[p]);
+    }
     if (availPersons.length === 0) { i--; continue; }
 
+    // For passato_prossimo with essere or reflexive verbs, gender matters
+    // → prefer concrete aliases; when using pronouns, show gender hint.
+    const needsAgreement =
+      tense === "passato_prossimo" && (verb.aux === "essere" || verb.difficulty === "riflessivo");
+
     if (config.mode === "complet") {
-      const useAlias = Math.random() < 0.15;
+      const useAlias = needsAgreement ? Math.random() < 0.6 : Math.random() < 0.15;
       const questions: Question[] = [];
       for (const p of availPersons) {
-        const ans = row[p];
+        const sf = subjectFor(tense, p, useAlias, needsAgreement);
+        const ans = computeAnswer(verb, tense, sf.info);
         if (!ans) continue;
-        questions.push({ verb, tense, person: p, subject: subjectFor(tense, p, useAlias), answer: ans });
+        questions.push({ verb, tense, person: p, subject: sf.text, answer: ans });
       }
       if (questions.length === 0) { i--; continue; }
       items.push({ kind: "complet", verb, tense, questions });
     } else {
       const person = availPersons[Math.floor(Math.random() * availPersons.length)];
-      const ans = row[person]!;
+      const useAlias = needsAgreement ? Math.random() < 0.6 : Math.random() < 0.2;
+      const sf = subjectFor(tense, person, useAlias, needsAgreement);
+      const ans = computeAnswer(verb, tense, sf.info);
+      if (!ans) { i--; continue; }
       items.push({
         kind: "mixte", verb, tense,
-        questions: [{ verb, tense, person, subject: subjectFor(tense, person, Math.random() < 0.2), answer: ans }],
+        questions: [{ verb, tense, person, subject: sf.text, answer: ans }],
       });
     }
   }
