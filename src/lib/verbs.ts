@@ -57,7 +57,8 @@ export interface Verb {
 }
 
 // Helpers to generate regular -are/-ere/-ire conjugations
-function regAre(stem: string): Record<Tense, Record<Person, string>> {
+type RegularConj = Partial<Record<Tense, Record<Person, string>>>;
+function regAre(stem: string): RegularConj {
   return {
     presente: { io: stem + "o", tu: stem + "i", lui: stem + "a", noi: stem + "iamo", voi: stem + "ate", loro: stem + "ano" },
     imperfetto: { io: stem + "avo", tu: stem + "avi", lui: stem + "ava", noi: stem + "avamo", voi: stem + "avate", loro: stem + "avano" },
@@ -70,7 +71,7 @@ function regAre(stem: string): Record<Tense, Record<Person, string>> {
     gerundio: { io: "", tu: "", lui: stem + "ando", noi: "", voi: "", loro: "" },
   };
 }
-function regEre(stem: string): Record<Tense, Record<Person, string>> {
+function regEre(stem: string): RegularConj {
   return {
     presente: { io: stem + "o", tu: stem + "i", lui: stem + "e", noi: stem + "iamo", voi: stem + "ete", loro: stem + "ono" },
     imperfetto: { io: stem + "evo", tu: stem + "evi", lui: stem + "eva", noi: stem + "evamo", voi: stem + "evate", loro: stem + "evano" },
@@ -83,7 +84,7 @@ function regEre(stem: string): Record<Tense, Record<Person, string>> {
     gerundio: { io: "", tu: "", lui: stem + "endo", noi: "", voi: "", loro: "" },
   };
 }
-function regIre(stem: string, isc = false): Record<Tense, Record<Person, string>> {
+function regIre(stem: string, isc = false): RegularConj {
   const pres = isc
     ? { io: stem + "isco", tu: stem + "isci", lui: stem + "isce", noi: stem + "iamo", voi: stem + "ite", loro: stem + "iscono" }
     : { io: stem + "o", tu: stem + "i", lui: stem + "e", noi: stem + "iamo", voi: stem + "ite", loro: stem + "ono" };
