@@ -14,6 +14,7 @@ export const PERSON_LABEL: Record<Person, string> = {
 
 export type Tense =
   | "presente"
+  | "presente_progressivo"
   | "passato_prossimo"
   | "imperfetto"
   | "futuro"
@@ -25,6 +26,7 @@ export type Tense =
 
 export const TENSES: { id: Tense; fr: string; it: string }[] = [
   { id: "presente", fr: "Présent", it: "Presente" },
+  { id: "presente_progressivo", fr: "Présent progressif", it: "Presente progressivo" },
   { id: "passato_prossimo", fr: "Passé composé", it: "Passato prossimo" },
   { id: "imperfetto", fr: "Imparfait", it: "Imperfetto" },
   { id: "futuro", fr: "Futur", it: "Futuro semplice" },
@@ -35,12 +37,11 @@ export const TENSES: { id: Tense; fr: string; it: string }[] = [
   { id: "gerundio", fr: "Gérondif", it: "Gerundio presente" },
 ];
 
-export type Difficulty = "courant" | "regulier" | "irregulier" | "difficile" | "riflessivo";
+export type Difficulty = "courant" | "regulier" | "irregulier" | "riflessivo";
 export const DIFFICULTIES: { id: Difficulty; label: string }[] = [
   { id: "courant", label: "Les plus courants" },
   { id: "regulier", label: "Réguliers" },
   { id: "irregulier", label: "Exceptions / Irréguliers" },
-  { id: "difficile", label: "Difficiles" },
   { id: "riflessivo", label: "Réfléchis / Pronominaux" },
 ];
 
