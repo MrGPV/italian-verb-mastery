@@ -497,7 +497,7 @@ const rawVerbs: Verb[] = [
   },
   // DIFFICILES
   {
-    infinitive: "bere", french: "boire", difficulty: "difficile", aux: "avere", participle: "bevuto",
+    infinitive: "bere", french: "boire", difficulty: "irregulier", aux: "avere", participle: "bevuto",
     conj: {
       presente: { io: "bevo", tu: "bevi", lui: "beve", noi: "beviamo", voi: "bevete", loro: "bevono" },
       imperfetto: { io: "bevevo", tu: "bevevi", lui: "beveva", noi: "bevevamo", voi: "bevevate", loro: "bevevano" },
@@ -508,7 +508,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Bere garde le radical latin 'bev-' au présent et à l'imparfait, mais 'ber-' au futur/conditionnel (avec double 'r')." },
   },
   {
-    infinitive: "uscire", french: "sortir", difficulty: "difficile", aux: "essere", participle: "uscito",
+    infinitive: "uscire", french: "sortir", difficulty: "irregulier", aux: "essere", participle: "uscito",
     conj: {
       presente: { io: "esco", tu: "esci", lui: "esce", noi: "usciamo", voi: "uscite", loro: "escono" },
       imperfetto: { io: "uscivo", tu: "uscivi", lui: "usciva", noi: "uscivamo", voi: "uscivate", loro: "uscivano" },
@@ -519,7 +519,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Uscire change 'u' en 'e' aux personnes fortes : esco, esci, esce, escono — mais usciamo et uscite gardent le 'u'." },
   },
   {
-    infinitive: "rimanere", french: "rester", difficulty: "difficile", aux: "essere", participle: "rimasto",
+    infinitive: "rimanere", french: "rester", difficulty: "irregulier", aux: "essere", participle: "rimasto",
     conj: {
       presente: { io: "rimango", tu: "rimani", lui: "rimane", noi: "rimaniamo", voi: "rimanete", loro: "rimangono" },
       imperfetto: { io: "rimanevo", tu: "rimanevi", lui: "rimaneva", noi: "rimanevamo", voi: "rimanevate", loro: "rimanevano" },
@@ -533,7 +533,7 @@ const rawVerbs: Verb[] = [
     },
   },
   {
-    infinitive: "scegliere", french: "choisir", difficulty: "difficile", aux: "avere", participle: "scelto",
+    infinitive: "scegliere", french: "choisir", difficulty: "irregulier", aux: "avere", participle: "scelto",
     conj: {
       presente: { io: "scelgo", tu: "scegli", lui: "sceglie", noi: "scegliamo", voi: "scegliete", loro: "scelgono" },
       imperfetto: { io: "sceglievo", tu: "sceglievi", lui: "sceglieva", noi: "sceglievamo", voi: "sceglievate", loro: "sceglievano" },
@@ -546,7 +546,7 @@ const rawVerbs: Verb[] = [
     },
   },
   {
-    infinitive: "porre", french: "poser / placer", difficulty: "difficile", aux: "avere", participle: "posto",
+    infinitive: "porre", french: "poser / placer", difficulty: "irregulier", aux: "avere", participle: "posto",
     conj: {
       presente: { io: "pongo", tu: "poni", lui: "pone", noi: "poniamo", voi: "ponete", loro: "pongono" },
       imperfetto: { io: "ponevo", tu: "ponevi", lui: "poneva", noi: "ponevamo", voi: "ponevate", loro: "ponevano" },
@@ -557,7 +557,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Porre vient du latin 'ponere' : radical 'pon-' partout. Modèle pour comporre, proporre, supporre." },
   },
   {
-    infinitive: "tradurre", french: "traduire", difficulty: "difficile", aux: "avere", participle: "tradotto",
+    infinitive: "tradurre", french: "traduire", difficulty: "irregulier", aux: "avere", participle: "tradotto",
     gerund: "traducendo",
     conj: {
       presente: { io: "traduco", tu: "traduci", lui: "traduce", noi: "traduciamo", voi: "traducete", loro: "traducono" },
@@ -569,7 +569,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Du latin 'traducere' : radical 'traduc-'. Futur avec double 'r' : tradurrò. Participe : tradotto." },
   },
   {
-    infinitive: "condurre", french: "conduire / mener", difficulty: "difficile", aux: "avere", participle: "condotto",
+    infinitive: "condurre", french: "conduire / mener", difficulty: "irregulier", aux: "avere", participle: "condotto",
     gerund: "conducendo",
     conj: {
       presente: { io: "conduco", tu: "conduci", lui: "conduce", noi: "conduciamo", voi: "conducete", loro: "conducono" },
@@ -581,7 +581,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Même modèle que tradurre : radical 'conduc-', participe 'condotto'." },
   },
   {
-    infinitive: "cogliere", french: "cueillir / saisir", difficulty: "difficile", aux: "avere", participle: "colto",
+    infinitive: "cogliere", french: "cueillir / saisir", difficulty: "irregulier", aux: "avere", participle: "colto",
     gerund: "cogliendo",
     conj: {
       presente: { io: "colgo", tu: "cogli", lui: "coglie", noi: "cogliamo", voi: "cogliete", loro: "colgono" },
@@ -593,7 +593,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Comme scegliere : alternance 'gli' / 'lg'. Participe irrégulier : colto." },
   },
   {
-    infinitive: "spegnere", french: "éteindre", difficulty: "difficile", aux: "avere", participle: "spento",
+    infinitive: "spegnere", french: "éteindre", difficulty: "irregulier", aux: "avere", participle: "spento",
     gerund: "spegnendo",
     conj: {
       presente: { io: "spengo", tu: "spegni", lui: "spegne", noi: "spegniamo", voi: "spegnete", loro: "spengono" },
@@ -605,7 +605,7 @@ const rawVerbs: Verb[] = [
     notes: { presente: "Alternance 'gn' / 'ng' : spegno / spengo. Participe irrégulier : spento." },
   },
   {
-    infinitive: "tacere", french: "se taire", difficulty: "difficile", aux: "avere", participle: "taciuto",
+    infinitive: "tacere", french: "se taire", difficulty: "irregulier", aux: "avere", participle: "taciuto",
     gerund: "tacendo",
     conj: {
       presente: { io: "taccio", tu: "taci", lui: "tace", noi: "tacciamo", voi: "tacete", loro: "tacciono" },
