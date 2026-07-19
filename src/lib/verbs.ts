@@ -13,6 +13,7 @@ export const PERSON_LABEL: Record<Person, string> = {
 };
 
 export type Tense =
+  | "infinitivo"
   | "presente"
   | "presente_progressivo"
   | "passato_prossimo"
@@ -25,6 +26,7 @@ export type Tense =
   | "gerundio";
 
 export const TENSES: { id: Tense; fr: string; it: string }[] = [
+  { id: "infinitivo", fr: "Infinitif", it: "Infinito" },
   { id: "presente", fr: "Présent", it: "Presente" },
   { id: "presente_progressivo", fr: "Présent progressif", it: "Presente progressivo" },
   { id: "passato_prossimo", fr: "Passé composé", it: "Passato prossimo" },
