@@ -146,8 +146,8 @@ function withPassato(v: Verb): Verb {
 const REFL_PRONOUNS: Record<Person, string> = {
   io: "mi", tu: "ti", lui: "si", noi: "ci", voi: "vi", loro: "si",
 };
-function toReflexive(conj: Record<Tense, Record<Person, string>>): Record<Tense, Record<Person, string>> {
-  const out = {} as Record<Tense, Record<Person, string>>;
+function toReflexive(conj: RegularConj): RegularConj {
+  const out: RegularConj = {};
   (Object.keys(conj) as Tense[]).forEach((t) => {
     const row = conj[t];
     if (!row || Object.keys(row).length === 0) return;
