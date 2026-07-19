@@ -700,34 +700,114 @@ export function findVerb(inf: string): Verb | undefined {
   return VERBS.find((v) => v.infinitive === inf);
 }
 
-// Real-subject alternatives for lui / loro slots to spice up questions
-export const SUBJECT_ALIASES: Record<"lui" | "loro", string[]> = {
-  lui: ["Luca", "Daniela", "Il gatto", "Mio padre", "La ragazza", "Marco"],
-  loro: ["Luca e Marco", "Le ragazze", "Gli alberi", "I miei amici", "Daniela e Angela", "tu ed io"],
-};
-// "tu ed io" is a "noi" subject; keep it separate for noi
-export const NOI_ALIASES = ["tu ed io", "io e Marco", "noi due"];
-export const VOI_ALIASES = ["tu e Luca", "voi ragazzi", "tu ed Angela"];
-export const TU_ALIASES: string[] = [];
-export const IO_ALIASES: string[] = [];
+// ---------- Subject with gender / number metadata -------------------------
+export type Gender = "m" | "f";
+export type Numerus = "s" | "p";
+export interface SubjectInfo {
+  text: string;
+  person: Person;
+  gender: Gender;
+  number: Numerus;
+}
+type Alias = { text: string; gender: Gender };
+const LUI_ALIASES: Alias[] = [
+  { text: "Luca", gender: "m" }, { text: "Marco", gender: "m" },
+  { text: "Mio padre", gender: "m" }, { text: "Il gatto", gender: "m" },
+  { text: "Daniela", gender: "f" }, { text: "La ragazza", gender: "f" },
+  { text: "Mia sorella", gender: "f" },
+];
+const LORO_ALIASES: Alias[] = [
+  { text: "Luca e Marco", gender: "m" }, { text: "Gli alberi", gender: "m" },
+  { text: "I miei amici", gender: "m" },
+  { text: "Le ragazze", gender: "f" }, { text: "Daniela e Angela", gender: "f" },
+];
+const NOI_ALIASES: Alias[] = [
+  { text: "tu ed io", gender: "m" }, { text: "io e Marco", gender: "m" },
+  { text: "Angela ed io", gender: "f" },
+];
+const VOI_ALIASES: Alias[] = [
+  { text: "tu e Luca", gender: "m" }, { text: "voi ragazzi", gender: "m" },
+  { text: "tu ed Angela", gender: "f" }, { text: "voi ragazze", gender: "f" },
+];
 
-export function displaySubject(person: Person, useAlias: boolean): string {
-  if (!useAlias) {
-    // 3ème pers. singulier : alterne "lui" / "lei" (jamais "lui/lei")
-    if (person === "lui") return Math.random() < 0.5 ? "lui" : "lei";
-    return PERSON_LABEL[person];
-  }
+function pick<T>(a: T[]): T { return a[Math.floor(Math.random() * a.length)]; }
+
+export function displaySubjectInfo(
+  person: Person,
+  useAlias: boolean,
+  needsGender = false,
+): SubjectInfo {
   const pool =
-    person === "lui" ? SUBJECT_ALIASES.lui
-    : person === "loro" ? SUBJECT_ALIASES.loro
-    : person === "noi" ? NOI_ALIASES
-    : person === "voi" ? VOI_ALIASES
-    : [];
-  if (pool.length === 0) {
-    if (person === "lui") return Math.random() < 0.5 ? "lui" : "lei";
-    return PERSON_LABEL[person];
+    person === "lui" ? LUI_ALIASES :
+    person === "loro" ? LORO_ALIASES :
+    person === "noi" ? NOI_ALIASES :
+    person === "voi" ? VOI_ALIASES : [];
+
+  if (useAlias && pool.length > 0) {
+    const a = pick(pool);
+    return { text: a.text, person, gender: a.gender, number: person === "loro" || person === "noi" || person === "voi" ? "p" : "s" };
   }
-  return pool[Math.floor(Math.random() * pool.length)];
+  // Pronoun form
+  const gender: Gender = Math.random() < 0.5 ? "m" : "f";
+  if (person === "lui") return { text: gender === "m" ? "lui" : "lei", person, gender, number: "s" };
+  const num: Numerus = person === "io" || person === "tu" ? "s" : "p";
+  const label = PERSON_LABEL[person];
+  const text = needsGender ? `${label} (${gender === "m" ? "m." : "f."})` : label;
+  return { text, person, gender, number: num };
+}
+
+// Kept for backward compat (dictionary etc.)
+export function displaySubject(person: Person, useAlias: boolean): string {
+  return displaySubjectInfo(person, useAlias).text;
+}
+
+// ---------- Agreement + dynamic answer generation ------------------------
+export function agreeParticiple(part: string, g: Gender, n: Numerus): string {
+  const target = n === "s" ? (g === "f" ? "a" : "o") : (g === "f" ? "e" : "i");
+  return part.replace(/[aoei]$/, target);
+}
+
+const STARE_PRES: Record<Person, string> = {
+  io: "sto", tu: "stai", lui: "sta", noi: "stiamo", voi: "state", loro: "stanno",
+};
+
+export function getGerundBase(v: Verb): string {
+  if (v.gerund) return v.gerund;
+  const g = v.conj.gerundio?.lui;
+  if (g) return v.difficulty === "riflessivo" ? g.replace(/si$/, "") : g;
+  // fallback from infinitive
+  const inf = v.difficulty === "riflessivo" ? v.infinitive.replace(/rsi$/, "re") : v.infinitive;
+  if (inf.endsWith("are")) return inf.slice(0, -3) + "ando";
+  return inf.slice(0, -3) + "endo";
+}
+
+export function computeAnswer(verb: Verb, tense: Tense, subj: SubjectInfo): string {
+  const p = subj.person;
+
+  if (tense === "presente_progressivo") {
+    const base = getGerundBase(verb);
+    const stare = STARE_PRES[p];
+    if (verb.difficulty === "riflessivo") {
+      return `${REFL_PRONOUNS[p]} ${stare} ${base}`;
+    }
+    return `${stare} ${base}`;
+  }
+
+  if (tense === "passato_prossimo") {
+    if (verb.difficulty === "riflessivo") {
+      const part = agreeParticiple(verb.participle, subj.gender, subj.number);
+      const aux = essere_pres[p];
+      return `${REFL_PRONOUNS[p]} ${aux} ${part}`;
+    }
+    if (verb.aux === "essere") {
+      const part = agreeParticiple(verb.participle, subj.gender, subj.number);
+      return `${essere_pres[p]} ${part}`;
+    }
+    // avere: no agreement with subject
+    return `${avere_pres[p]} ${verb.participle}`;
+  }
+
+  return verb.conj[tense]?.[p] ?? "";
 }
 
 // ---------- Regular reference (for irregular-highlighting in the dictionary) ---------
