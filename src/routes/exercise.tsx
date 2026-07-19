@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { loadConfig, loadStats, recordAttempt } from "@/lib/storage";
-import { buildSession, isCorrect, type Item } from "@/lib/session";
+import { buildSession, isCorrectQ, bestReference, type Item } from "@/lib/session";
 import { PERSON_LABEL, TENSES, diffParts } from "@/lib/verbs";
 import { CheckCircle2, XCircle, BookOpen, ArrowRight, Trophy } from "lucide-react";
 
@@ -86,7 +86,7 @@ function Exercise() {
 
   const check = () => {
     if (!item || state !== "input" || !allFilled) return;
-    const res = item.questions.map((q, k) => isCorrect(inputs[k], q.answer));
+    const res = item.questions.map((q, k) => isCorrectQ(inputs[k], q));
     res.forEach((ok, k) => {
       const q = item.questions[k];
       recordAttempt(q.verb.infinitive, q.tense, q.person, ok);
@@ -124,6 +124,10 @@ function Exercise() {
 
   const progress = ((i) / items.length) * 100;
   const allCorrect = state === "checked" && results.every(Boolean);
+  const firstQ = item.questions[0];
+  const isInfinitivo = item.tense === "infinitivo";
+  const bigDisplay = firstQ.prompt ?? item.verb.infinitive;
+  const hideFrench = firstQ.hideFrench;
 
   return (
     <AppShell>
@@ -142,11 +146,16 @@ function Exercise() {
           </div>
 
           <div className="mb-6 text-center">
-            <div className="font-display text-4xl font-black tracking-tight text-foreground">{item.verb.infinitive}</div>
-            <div className="mt-1 text-sm italic text-muted-foreground">« {item.verb.french} »</div>
+            <div className="font-display text-4xl font-black tracking-tight text-foreground">{bigDisplay}</div>
+            {!hideFrench && (
+              <div className="mt-1 text-sm italic text-muted-foreground">« {item.verb.french} »</div>
+            )}
+            {firstQ.directionLabel && (
+              <div className="mt-2 text-sm font-semibold text-primary">{firstQ.directionLabel}</div>
+            )}
           </div>
 
-          {item.kind === "complet" && (
+          {item.kind === "complet" && !isInfinitivo && (
             <div className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Conjugue les 6 personnes
             </div>
@@ -158,6 +167,7 @@ function Exercise() {
                 const checked = state === "checked";
                 const ok = results[k];
                 const border = !checked ? "" : ok ? "border-success bg-success/10" : "border-destructive bg-destructive/10";
+                const ref = checked && !ok ? bestReference(inputs[k] ?? "", q) : q.answer;
                 return (
                   <div key={k} className="grid grid-cols-[5.5rem_1fr] items-center gap-2">
                     <div className="text-right">
@@ -184,7 +194,7 @@ function Exercise() {
                             <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />
                             <span className="text-muted-foreground">Ta réponse :</span>
                             <span className="font-semibold">
-                              {diffParts(inputs[k] ?? "", q.answer).map((part, i) =>
+                              {diffParts(inputs[k] ?? "", ref).map((part, i) =>
                                 part.bold
                                   ? <span key={i} className="rounded bg-destructive/25 px-0.5 font-bold text-destructive">{part.text}</span>
                                   : <span key={i}>{part.text}</span>
@@ -195,12 +205,17 @@ function Exercise() {
                             <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
                             <span className="text-muted-foreground">Correct :</span>
                             <span className="font-bold text-foreground">
-                              {diffParts(q.answer, inputs[k] ?? "").map((part, i) =>
+                              {diffParts(ref, inputs[k] ?? "").map((part, i) =>
                                 part.bold
                                   ? <span key={i} className="rounded bg-success/25 px-0.5 text-success">{part.text}</span>
                                   : <span key={i}>{part.text}</span>
                               )}
                             </span>
+                            {(q.alternates?.length ?? 0) > 0 && (
+                              <span className="ml-1 text-muted-foreground">
+                                (aussi&nbsp;: {[q.answer, ...(q.alternates ?? [])].filter((a) => a !== ref).join(", ")})
+                              </span>
+                            )}
                           </div>
                         </div>
                       )}
@@ -237,10 +252,10 @@ function Exercise() {
               </div>
             )}
 
-            {state === "checked" && !allCorrect && (
+            {state === "checked" && !allCorrect && !isInfinitivo && (
               <div className="mt-4 space-y-3">
                 <div className="rounded-xl border border-accent/40 bg-accent/10 p-3">
-                  <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-accent-foreground">
+                  <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-foreground">
                     <BookOpen className="h-3.5 w-3.5" />
                     Conjugaison — <span className="italic">{item.verb.infinitive}</span> · {tenseLabel?.it}
                   </div>
@@ -267,6 +282,12 @@ function Exercise() {
                   Continuer <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
+            )}
+
+            {state === "checked" && !allCorrect && isInfinitivo && (
+              <Button type="submit" size="lg" className="mt-4 h-14 w-full text-base font-bold">
+                Continuer <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             )}
           </form>
         </CardContent>

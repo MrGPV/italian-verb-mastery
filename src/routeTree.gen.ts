@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatsRouteImport } from './routes/stats'
+import { Route as MistakesRouteImport } from './routes/mistakes'
 import { Route as ExerciseRouteImport } from './routes/exercise'
 import { Route as DictionaryRouteImport } from './routes/dictionary'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const StatsRoute = StatsRouteImport.update({
   id: '/stats',
   path: '/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MistakesRoute = MistakesRouteImport.update({
+  id: '/mistakes',
+  path: '/mistakes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExerciseRoute = ExerciseRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dictionary': typeof DictionaryRoute
   '/exercise': typeof ExerciseRoute
+  '/mistakes': typeof MistakesRoute
   '/stats': typeof StatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dictionary': typeof DictionaryRoute
   '/exercise': typeof ExerciseRoute
+  '/mistakes': typeof MistakesRoute
   '/stats': typeof StatsRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dictionary': typeof DictionaryRoute
   '/exercise': typeof ExerciseRoute
+  '/mistakes': typeof MistakesRoute
   '/stats': typeof StatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dictionary' | '/exercise' | '/stats'
+  fullPaths: '/' | '/dictionary' | '/exercise' | '/mistakes' | '/stats'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dictionary' | '/exercise' | '/stats'
-  id: '__root__' | '/' | '/dictionary' | '/exercise' | '/stats'
+  to: '/' | '/dictionary' | '/exercise' | '/mistakes' | '/stats'
+  id: '__root__' | '/' | '/dictionary' | '/exercise' | '/mistakes' | '/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DictionaryRoute: typeof DictionaryRoute
   ExerciseRoute: typeof ExerciseRoute
+  MistakesRoute: typeof MistakesRoute
   StatsRoute: typeof StatsRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/stats'
       fullPath: '/stats'
       preLoaderRoute: typeof StatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mistakes': {
+      id: '/mistakes'
+      path: '/mistakes'
+      fullPath: '/mistakes'
+      preLoaderRoute: typeof MistakesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exercise': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DictionaryRoute: DictionaryRoute,
   ExerciseRoute: ExerciseRoute,
+  MistakesRoute: MistakesRoute,
   StatsRoute: StatsRoute,
 }
 export const routeTree = rootRouteImport

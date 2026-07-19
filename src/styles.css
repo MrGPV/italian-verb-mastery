@@ -217,24 +217,26 @@
   border-radius: 1rem;
   letter-spacing: 0.04em;
 }
-.tense-presente         { background-color: oklch(0.93 0.09 148); color: oklch(0.32 0.14 148); }
-.tense-presente_progressivo { background-color: oklch(0.93 0.09 170); color: oklch(0.32 0.14 170); }
-.tense-passato_prossimo { background-color: oklch(0.94 0.07 25);  color: oklch(0.4  0.18 25); }
-.tense-imperfetto       { background-color: oklch(0.94 0.1  75);  color: oklch(0.4  0.15 75); }
-.tense-futuro           { background-color: oklch(0.92 0.08 230); color: oklch(0.35 0.16 230); }
-.tense-condizionale     { background-color: oklch(0.92 0.08 310); color: oklch(0.35 0.16 310); }
-.tense-congiuntivo      { background-color: oklch(0.92 0.09 195); color: oklch(0.32 0.13 195); }
-.tense-imperativo       { background-color: oklch(0.93 0.11 55);  color: oklch(0.38 0.17 55); }
-.tense-participio       { background-color: oklch(0.93 0.08 340); color: oklch(0.38 0.16 340); }
-.tense-gerundio         { background-color: oklch(0.92 0.08 265); color: oklch(0.35 0.16 265); }
+.tense-infinitivo       { background-color: oklch(0.90 0.005 90);  color: oklch(0.35 0.01 90); }
+.tense-presente         { background-color: oklch(0.88 0.14 145);  color: oklch(0.28 0.14 145); }
+.tense-presente_progressivo { background-color: oklch(0.95 0.06 200); color: oklch(0.30 0.14 200); }
+.tense-passato_prossimo { background-color: oklch(0.86 0.11 20);   color: oklch(0.36 0.19 20); }
+.tense-imperfetto       { background-color: oklch(0.92 0.13 85);   color: oklch(0.42 0.16 65); }
+.tense-futuro           { background-color: oklch(0.85 0.10 250);  color: oklch(0.32 0.17 250); }
+.tense-condizionale     { background-color: oklch(0.90 0.10 305);  color: oklch(0.34 0.18 305); }
+.tense-congiuntivo      { background-color: oklch(0.94 0.14 110);  color: oklch(0.34 0.15 120); }
+.tense-imperativo       { background-color: oklch(0.87 0.15 45);   color: oklch(0.40 0.19 40); }
+.tense-participio       { background-color: oklch(0.90 0.11 350);  color: oklch(0.38 0.19 355); }
+.tense-gerundio         { background-color: oklch(0.83 0.11 275);  color: oklch(0.30 0.18 275); }
 
-.dark .tense-presente         { background-color: oklch(0.3  0.09 148); color: oklch(0.88 0.14 148); }
-.dark .tense-presente_progressivo { background-color: oklch(0.3  0.09 170); color: oklch(0.88 0.14 170); }
-.dark .tense-passato_prossimo { background-color: oklch(0.32 0.08 25);  color: oklch(0.9  0.16 25); }
-.dark .tense-imperfetto       { background-color: oklch(0.32 0.08 75);  color: oklch(0.9  0.14 75); }
-.dark .tense-futuro           { background-color: oklch(0.3  0.08 230); color: oklch(0.88 0.14 230); }
-.dark .tense-condizionale     { background-color: oklch(0.3  0.08 310); color: oklch(0.88 0.14 310); }
-.dark .tense-congiuntivo      { background-color: oklch(0.3  0.08 195); color: oklch(0.88 0.13 195); }
-.dark .tense-imperativo       { background-color: oklch(0.32 0.1  55);  color: oklch(0.9  0.16 55); }
-.dark .tense-participio       { background-color: oklch(0.3  0.08 340); color: oklch(0.88 0.14 340); }
-.dark .tense-gerundio         { background-color: oklch(0.3  0.08 265); color: oklch(0.88 0.14 265); }
+.dark .tense-infinitivo       { background-color: oklch(0.30 0.005 90); color: oklch(0.86 0.01 90); }
+.dark .tense-presente         { background-color: oklch(0.32 0.11 145); color: oklch(0.90 0.15 145); }
+.dark .tense-presente_progressivo { background-color: oklch(0.30 0.09 200); color: oklch(0.88 0.14 200); }
+.dark .tense-passato_prossimo { background-color: oklch(0.34 0.11 20);  color: oklch(0.90 0.17 20); }
+.dark .tense-imperfetto       { background-color: oklch(0.36 0.11 75);  color: oklch(0.92 0.16 75); }
+.dark .tense-futuro           { background-color: oklch(0.28 0.10 250); color: oklch(0.86 0.15 250); }
+.dark .tense-condizionale     { background-color: oklch(0.32 0.11 305); color: oklch(0.90 0.16 305); }
+.dark .tense-congiuntivo      { background-color: oklch(0.34 0.13 115); color: oklch(0.92 0.16 115); }
+.dark .tense-imperativo       { background-color: oklch(0.34 0.12 45);  color: oklch(0.92 0.17 45); }
+.dark .tense-participio       { background-color: oklch(0.32 0.11 350); color: oklch(0.90 0.16 350); }
+.dark .tense-gerundio         { background-color: oklch(0.30 0.11 275); color: oklch(0.88 0.16 275); }
