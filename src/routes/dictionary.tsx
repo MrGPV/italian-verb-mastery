@@ -148,7 +148,12 @@ function VerbFullConj({ verb }: { verb: Verb }) {
                 {PERSON_ORDER_2COL.map((p) => {
                   const val = (row as Partial<Record<Person, string>>)[p];
                   if (!val) return null;
-                  const parts = diffParts(val, refRow?.[p]);
+                  // No irregular highlighting when we don't have a regular
+                  // reference (e.g. presente_progressivo is dynamically built
+                  // from `stare` + gerundio and has no "regular" counterpart).
+                  const parts = refRow?.[p]
+                    ? diffParts(val, refRow[p])
+                    : [{ text: val, bold: false }];
                   return (
                     <div key={p} className="flex items-baseline gap-2">
                       <span className="w-12 shrink-0 text-right text-xs font-semibold text-muted-foreground">
