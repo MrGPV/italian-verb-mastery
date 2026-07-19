@@ -735,14 +735,14 @@ export function regularReference(v: Verb): Partial<Record<Tense, Partial<Record<
   const inf = v.infinitive;
   const isRefl = v.difficulty === "riflessivo";
   const base = isRefl ? inf.slice(0, -2) + "e" : inf;
-  let raw: Record<Tense, Record<Person, string>> | null = null;
+  let raw: RegularConj | null = null;
   let stem = "";
   if (base.endsWith("are")) { stem = base.slice(0, -3); raw = regAre(stem); }
   else if (base.endsWith("ere")) { stem = base.slice(0, -3); raw = regEre(stem); }
   else if (base.endsWith("ire")) { stem = base.slice(0, -3); raw = regIre(stem); }
   else if (base.endsWith("rre")) { stem = base.slice(0, -3); raw = regEre(stem); }
   if (!raw) return {};
-  const regPart = raw.participio.lui!;
+  const regPart = raw.participio!.lui!;
   if (isRefl) {
     const refl = toReflexive(raw);
     refl.passato_prossimo = reflexivePassato(regPart);
