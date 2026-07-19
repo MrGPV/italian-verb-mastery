@@ -69,10 +69,14 @@ function Index() {
           {TENSES.map((t) => {
             const on = cfg.tenses.includes(t.id);
             return (
-              <label key={t.id} className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-colors ${on ? "border-primary bg-primary/5" : "border-border"}`}>
-                <div>
-                  <div className="text-sm font-semibold">{t.fr}</div>
-                  <div className="text-xs italic text-muted-foreground">{t.it}</div>
+              <label
+                key={t.id}
+                className={`tense-${t.id} flex cursor-pointer items-center justify-between rounded-xl border-2 p-3 transition-all ${on ? "border-current shadow-sm" : "border-transparent opacity-60 hover:opacity-100"}`}
+                style={{ textTransform: "none", letterSpacing: 0 }}
+              >
+                <div className="normal-case tracking-normal">
+                  <div className="text-sm font-bold">{t.fr}</div>
+                  <div className="font-display text-xs italic opacity-80">{t.it}</div>
                 </div>
                 <Checkbox checked={on} onCheckedChange={() => toggleTense(t.id)} />
               </label>
