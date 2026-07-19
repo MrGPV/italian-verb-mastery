@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { loadConfig, loadStats, recordAttempt } from "@/lib/storage";
 import { buildSession, isCorrect, type Item } from "@/lib/session";
-import { PERSONS, PERSON_LABEL, TENSES } from "@/lib/verbs";
+import { PERSON_LABEL, TENSES, diffParts } from "@/lib/verbs";
 import { CheckCircle2, XCircle, BookOpen, ArrowRight, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/exercise")({
@@ -17,6 +17,8 @@ export const Route = createFileRoute("/exercise")({
 
 type ItemState = "input" | "checked";
 const ACCENTS = ["à", "è", "é", "ì", "ò", "ù"];
+// Order tuned so a 2-column grid shows singular on the left, plural on the right.
+const PERSON_ORDER_2COL = ["io", "noi", "tu", "voi", "lui", "loro"] as const;
 
 function Exercise() {
   const navigate = useNavigate();
@@ -177,10 +179,29 @@ function Exercise() {
                         className={`h-11 text-base font-semibold transition-colors ${border}`}
                       />
                       {checked && !ok && (
-                        <div className="mt-1 flex items-center gap-1 pl-1 text-xs">
-                          <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />
-                          <span className="text-muted-foreground">Bonne réponse :</span>
-                          <span className="font-bold text-foreground">{q.answer}</span>
+                        <div className="mt-1 space-y-0.5 pl-1 text-xs">
+                          <div className="flex items-center gap-1">
+                            <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />
+                            <span className="text-muted-foreground">Ta réponse :</span>
+                            <span className="font-semibold">
+                              {diffParts(inputs[k] ?? "", q.answer).map((part, i) =>
+                                part.bold
+                                  ? <span key={i} className="rounded bg-destructive/25 px-0.5 font-bold text-destructive">{part.text}</span>
+                                  : <span key={i}>{part.text}</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
+                            <span className="text-muted-foreground">Correct :</span>
+                            <span className="font-bold text-foreground">
+                              {diffParts(q.answer, inputs[k] ?? "").map((part, i) =>
+                                part.bold
+                                  ? <span key={i} className="rounded bg-success/25 px-0.5 text-success">{part.text}</span>
+                                  : <span key={i}>{part.text}</span>
+                              )}
+                            </span>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -223,8 +244,8 @@ function Exercise() {
                     <BookOpen className="h-3.5 w-3.5" />
                     Conjugaison — <span className="italic">{item.verb.infinitive}</span> · {tenseLabel?.it}
                   </div>
-                  <div className="grid grid-cols-1 gap-1 text-sm sm:grid-cols-2">
-                    {PERSONS.map((p) => {
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                    {PERSON_ORDER_2COL.map((p) => {
                       const ans = item.verb.conj[item.tense]?.[p];
                       if (!ans) return null;
                       const label =
