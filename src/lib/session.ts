@@ -51,7 +51,7 @@ const SINGLE_FORM: Tense[] = ["participio", "gerundio"];
 function subjectFor(tense: Tense, person: Person, useAlias: boolean, needsGender: boolean): { text: string; info: ReturnType<typeof displaySubjectInfo> } {
   const info = displaySubjectInfo(person, useAlias, needsGender);
   if (SINGLE_FORM.includes(tense)) return { text: "→", info };
-  if (tense === "imperativo") return { text: person + " !", info };
+  if (tense === "imperativo") return { text: `(${person})`, info };
   return { text: info.text, info };
 }
 
@@ -116,7 +116,13 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
         const sf = subjectFor(tense, p, useAlias, needsAgreement);
         const ans = computeAnswer(verb, tense, sf.info);
         if (!ans) continue;
-        questions.push({ verb, tense, person: p, subject: sf.text, answer: ans });
+        const q: Question = { verb, tense, person: p, subject: sf.text, answer: ans };
+        if (tense === "passato_prossimo" && sf.info.ambiguous) {
+          const otherG = sf.info.gender === "m" ? "f" : "m";
+          const alt = computeAnswer(verb, tense, { ...sf.info, gender: otherG });
+          if (alt && alt !== ans) q.alternates = [alt];
+        }
+        questions.push(q);
       }
       if (questions.length === 0) { i--; continue; }
       items.push({ kind: "complet", verb, tense, questions });
@@ -126,9 +132,15 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
       const sf = subjectFor(tense, person, useAlias, needsAgreement);
       const ans = computeAnswer(verb, tense, sf.info);
       if (!ans) { i--; continue; }
+      const q: Question = { verb, tense, person, subject: sf.text, answer: ans };
+      if (tense === "passato_prossimo" && sf.info.ambiguous) {
+        const otherG = sf.info.gender === "m" ? "f" : "m";
+        const alt = computeAnswer(verb, tense, { ...sf.info, gender: otherG });
+        if (alt && alt !== ans) q.alternates = [alt];
+      }
       items.push({
         kind: "mixte", verb, tense,
-        questions: [{ verb, tense, person, subject: sf.text, answer: ans }],
+        questions: [q],
       });
     }
   }
