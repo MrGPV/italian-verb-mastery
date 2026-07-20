@@ -60,18 +60,6 @@ function splitFrench(fr: string): string[] {
 }
 
 function buildInfinitivoQuestion(verb: Verb): Question {
-  const it2fr = Math.random() < 0.5;
-  if (it2fr) {
-    const alts = splitFrench(verb.french);
-    return {
-      verb, tense: "infinitivo", person: "lui", subject: "→ français",
-      prompt: verb.infinitive,
-      hideFrench: true,
-      answer: alts[0] ?? verb.french,
-      alternates: alts.slice(1),
-      directionLabel: "Traduis en français",
-    };
-  }
   return {
     verb, tense: "infinitivo", person: "lui", subject: "→ italiano",
     prompt: verb.french,
@@ -82,8 +70,11 @@ function buildInfinitivoQuestion(verb: Verb): Question {
 }
 
 export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
+  const DYN: Tense[] = ["presente_progressivo", "infinitivo"];
   const pool = VERBS.filter(
-    (v) => config.difficulties.includes(v.difficulty) && config.tenses.some((t) => v.conj[t]),
+    (v) =>
+      config.difficulties.includes(v.difficulty) &&
+      config.tenses.some((t) => DYN.includes(t) || v.conj[t]),
   );
   if (pool.length === 0 || config.tenses.length === 0) return [];
   const allTenses: Tense[] = config.tenses.slice();
