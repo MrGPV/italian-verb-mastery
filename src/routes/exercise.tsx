@@ -171,7 +171,7 @@ function Exercise() {
                 return (
                   <div key={k} className="grid grid-cols-[5.5rem_1fr] items-center gap-2">
                     <div className="text-right">
-                      <span className="rounded-md bg-accent/50 px-2 py-1 text-sm font-bold text-accent-foreground">
+                      <span className="rounded-md bg-accent/50 px-2 py-1 text-sm font-bold" style={{ color: "oklch(0.32 0.12 148)" }}>
                         {q.subject}
                       </span>
                     </div>
