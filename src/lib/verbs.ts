@@ -820,6 +820,15 @@ export function computeAnswer(verb: Verb, tense: Tense, subj: SubjectInfo): stri
   return verb.conj[tense]?.[p] ?? "";
 }
 
+// Best canonical answer for stats / dictionaries (no subject context).
+export function bestAnswerFor(verb: Verb, tense: Tense, person: Person): string {
+  if (tense === "infinitivo") return verb.infinitive;
+  if (tense === "participio") return verb.conj.participio?.lui ?? verb.participle;
+  if (tense === "gerundio") return verb.conj.gerundio?.lui ?? "";
+  const num: Numerus = person === "noi" || person === "voi" || person === "loro" ? "p" : "s";
+  return computeAnswer(verb, tense, { text: "", person, gender: "m", number: num });
+}
+
 // ---------- Regular reference (for irregular-highlighting in the dictionary) ---------
 export function regularReference(v: Verb): Partial<Record<Tense, Partial<Record<Person, string>>>> {
   const inf = v.infinitive;
