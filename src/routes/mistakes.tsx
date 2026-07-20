@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { loadStats, type StatsMap } from "@/lib/storage";
-import { findVerb, TENSES, PERSON_LABEL, DIFFICULTIES, type Tense, type Person } from "@/lib/verbs";
+import { findVerb, TENSES, PERSON_LABEL, type Tense, type Person } from "@/lib/verbs";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -43,13 +43,6 @@ function Mistakes() {
     .sort((a, b) => b.ko - a.ko || a.rate - b.rate)
     .slice(0, 20);
 
-  const diffLabel = (d: string) => DIFFICULTIES.find((x) => x.id === d)?.label ?? d;
-  const diffClass = (d: string) =>
-    d === "riflessivo" ? "bg-primary/15 text-primary"
-    : d === "irregulier" ? "bg-destructive/15 text-destructive"
-    : d === "regulier" ? "bg-success/15 text-success"
-    : "bg-muted text-muted-foreground";
-
   return (
     <AppShell>
       <section className="mb-4 flex items-center gap-2">
@@ -79,6 +72,9 @@ function Mistakes() {
                 const v = findVerb(r.verb);
                 const t = TENSES.find((x) => x.id === r.tense);
                 const pct = Math.round(r.rate * 100);
+                const answer = v && r.tense !== "infinitivo" && r.tense !== "presente_progressivo"
+                  ? v.conj[r.tense]?.[r.person]
+                  : undefined;
                 return (
                   <li key={idx} className="rounded-xl border border-border bg-card p-3">
                     <div className="flex items-start gap-3">
@@ -88,18 +84,16 @@ function Mistakes() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-baseline gap-x-2">
                           <span className="font-display text-lg font-bold italic text-foreground">{r.verb}</span>
-                          {v && (
-                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${diffClass(v.difficulty)}`}>
-                              {diffLabel(v.difficulty)}
-                            </span>
-                          )}
+                          {v && <span className="truncate text-xs italic text-muted-foreground">« {v.french} »</span>}
                         </div>
-                        {v && <div className="truncate text-xs italic text-muted-foreground">« {v.french} »</div>}
                         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                           <span className={`tense-chip tense-${r.tense}`} style={{ padding: "0.15rem 0.55rem", fontSize: "0.65rem" }}>
                             {t?.fr}
                           </span>
                           <span className="font-semibold text-muted-foreground">{personLabel(r.tense, r.person)}</span>
+                          {answer && (
+                            <span className="font-bold text-success">→ {answer}</span>
+                          )}
                         </div>
                       </div>
                       <div className="shrink-0 text-right">
