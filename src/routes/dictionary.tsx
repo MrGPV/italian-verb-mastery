@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import { Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   VERBS, TENSES, PERSON_LABEL,
   regularReference, diffParts, computeAnswer, displaySubjectInfo,
@@ -27,6 +28,7 @@ function norm(s: string) {
 function Dictionary() {
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Verb | null>(null);
+  const [hidden, setHidden] = useState<Set<Tense>>(new Set());
 
   const nq = norm(q.trim());
   const suggestions = useMemo(() => {
@@ -36,6 +38,20 @@ function Dictionary() {
       .sort((a, b) => a.infinitive.localeCompare(b.infinitive))
       .slice(0, 12);
   }, [nq, selected]);
+
+  const sortedVerbs = useMemo(
+    () => [...VERBS].sort((a, b) => a.infinitive.localeCompare(b.infinitive)),
+    [],
+  );
+  const selIdx = selected ? sortedVerbs.findIndex((v) => v.infinitive === selected.infinitive) : -1;
+  const gotoIdx = (idx: number) => {
+    const v = sortedVerbs[(idx + sortedVerbs.length) % sortedVerbs.length];
+    setSelected(v); setQ(v.infinitive);
+  };
+  const toggleTense = (t: Tense) =>
+    setHidden((h) => {
+      const n = new Set(h); n.has(t) ? n.delete(t) : n.add(t); return n;
+    });
 
   return (
     <AppShell>
@@ -86,7 +102,59 @@ function Dictionary() {
         </Card>
       )}
 
-      {selected && <VerbFullConj verb={selected} />}
+      {selected && (
+        <>
+          <div className="mb-3 flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={() => gotoIdx(selIdx - 1)} aria-label="Verbe précédent">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <select
+              value={selected.infinitive}
+              onChange={(e) => {
+                const v = sortedVerbs.find((x) => x.infinitive === e.target.value);
+                if (v) { setSelected(v); setQ(v.infinitive); }
+              }}
+              className="h-10 flex-1 rounded-md border border-input bg-card px-3 text-sm font-semibold text-foreground"
+            >
+              {sortedVerbs.map((v) => (
+                <option key={v.infinitive} value={v.infinitive}>
+                  {v.infinitive} — {v.french}
+                </option>
+              ))}
+            </select>
+            <Button variant="outline" size="icon" onClick={() => gotoIdx(selIdx + 1)} aria-label="Verbe suivant">
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <Card className="mb-3">
+            <CardContent className="pt-4">
+              <div className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                Temps affichés
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {TENSES.map((t) => {
+                  const on = !hidden.has(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => toggleTense(t.id)}
+                      className={`tense-chip tense-${t.id} transition-opacity ${on ? "" : "opacity-30"}`}
+                      style={{ padding: "0.25rem 0.6rem", fontSize: "0.65rem" }}
+                      aria-pressed={on}
+                    >
+                      {t.fr}
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          <VerbFullConj verb={selected} hidden={hidden} />
+        </>
+      )}
 
       {!selected && !suggestions.length && !q && (
         <p className="mt-6 text-center text-sm text-muted-foreground">
@@ -102,7 +170,7 @@ function Dictionary() {
 
 function personLabel(t: Tense, p: Person): string {
   if (t === "participio" || t === "gerundio") return "→";
-  if (t === "imperativo") return p + " !";
+  if (t === "imperativo") return `(${p})`;
   return PERSON_LABEL[p];
 }
 
@@ -118,7 +186,7 @@ function progressivoRow(verb: Verb): Record<Person, string> {
   return out;
 }
 
-function VerbFullConj({ verb }: { verb: Verb }) {
+function VerbFullConj({ verb, hidden }: { verb: Verb; hidden: Set<Tense> }) {
   const ref = useMemo(() => regularReference(verb), [verb]);
   return (
     <Card className="overflow-hidden">
@@ -133,7 +201,7 @@ function VerbFullConj({ verb }: { verb: Verb }) {
           </div>
         </div>
 
-        {TENSES.map((t) => {
+        {TENSES.filter((t) => !hidden.has(t.id)).map((t) => {
           const row = t.id === "presente_progressivo" ? progressivoRow(verb) : verb.conj[t.id];
           if (!row || Object.values(row).every((x) => !x)) return null;
           const refRow = t.id === "presente_progressivo" ? undefined : ref[t.id];
