@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { DIFFICULTIES, TENSES, type Difficulty, type Tense } from "@/lib/verbs";
 import { DEFAULT_CONFIG, loadConfig, saveConfig, type SessionConfig } from "@/lib/storage";
-import { Sparkles, PlayCircle, BookOpen } from "lucide-react";
+import { Sparkles, PlayCircle, BookOpen, GraduationCap } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -143,6 +143,9 @@ function Index() {
 
       <Button asChild variant="outline" size="lg" className="mt-3 h-12 w-full border-2 text-sm font-bold" style={{ borderColor: "var(--tricolore-green)", color: "var(--tricolore-green)" }}>
         <Link to="/dictionary"><BookOpen className="mr-2 h-4 w-4" />Consulter la conjugaison d'un verbe</Link>
+      </Button>
+      <Button asChild variant="outline" size="lg" className="mt-2 h-12 w-full border-2 text-sm font-bold" style={{ borderColor: "var(--tricolore-red)", color: "var(--tricolore-red)" }}>
+        <Link to="/theory"><GraduationCap className="mr-2 h-4 w-4" />Théorie de la conjugaison</Link>
       </Button>
     </AppShell>
   );

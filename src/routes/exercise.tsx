@@ -267,7 +267,7 @@ function Exercise() {
                         item.tense === "participio" || item.tense === "gerundio"
                           ? "→"
                           : item.tense === "imperativo"
-                          ? p + " !"
+                          ? `(${p})`
                           : PERSON_LABEL[p];
                       return (
                         <div key={p} className="flex items-baseline gap-2">

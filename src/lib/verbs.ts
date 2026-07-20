@@ -710,8 +710,9 @@ export interface SubjectInfo {
   person: Person;
   gender: Gender;
   number: Numerus;
+  ambiguous?: boolean;
 }
-type Alias = { text: string; gender: Gender };
+type Alias = { text: string; gender: Gender; ambiguous?: boolean };
 const LUI_ALIASES: Alias[] = [
   { text: "Luca", gender: "m" }, { text: "Marco", gender: "m" },
   { text: "Mio padre", gender: "m" }, { text: "Il gatto", gender: "m" },
@@ -724,12 +725,15 @@ const LORO_ALIASES: Alias[] = [
   { text: "Le ragazze", gender: "f" }, { text: "Daniela e Angela", gender: "f" },
 ];
 const NOI_ALIASES: Alias[] = [
-  { text: "tu ed io", gender: "m" }, { text: "io e Marco", gender: "m" },
-  { text: "Angela ed io", gender: "f" },
+  { text: "tu ed io", gender: "m", ambiguous: true },
+  { text: "io e Marco", gender: "m", ambiguous: true },
+  { text: "Angela ed io", gender: "f", ambiguous: true },
 ];
 const VOI_ALIASES: Alias[] = [
-  { text: "tu e Luca", gender: "m" }, { text: "voi ragazzi", gender: "m" },
-  { text: "tu ed Angela", gender: "f" }, { text: "voi ragazze", gender: "f" },
+  { text: "tu e Luca", gender: "m", ambiguous: true },
+  { text: "voi ragazzi", gender: "m" },
+  { text: "tu ed Angela", gender: "f", ambiguous: true },
+  { text: "voi ragazze", gender: "f" },
 ];
 
 function pick<T>(a: T[]): T { return a[Math.floor(Math.random() * a.length)]; }
@@ -747,7 +751,11 @@ export function displaySubjectInfo(
 
   if (useAlias && pool.length > 0) {
     const a = pick(pool);
-    return { text: a.text, person, gender: a.gender, number: person === "loro" || person === "noi" || person === "voi" ? "p" : "s" };
+    return {
+      text: a.text, person, gender: a.gender,
+      number: person === "loro" || person === "noi" || person === "voi" ? "p" : "s",
+      ambiguous: a.ambiguous,
+    };
   }
   // Pronoun form
   const gender: Gender = Math.random() < 0.5 ? "m" : "f";
@@ -810,6 +818,15 @@ export function computeAnswer(verb: Verb, tense: Tense, subj: SubjectInfo): stri
   }
 
   return verb.conj[tense]?.[p] ?? "";
+}
+
+// Best canonical answer for stats / dictionaries (no subject context).
+export function bestAnswerFor(verb: Verb, tense: Tense, person: Person): string {
+  if (tense === "infinitivo") return verb.infinitive;
+  if (tense === "participio") return verb.conj.participio?.lui ?? verb.participle;
+  if (tense === "gerundio") return verb.conj.gerundio?.lui ?? "";
+  const num: Numerus = person === "noi" || person === "voi" || person === "loro" ? "p" : "s";
+  return computeAnswer(verb, tense, { text: "", person, gender: "m", number: num });
 }
 
 // ---------- Regular reference (for irregular-highlighting in the dictionary) ---------

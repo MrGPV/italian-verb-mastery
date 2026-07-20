@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { loadStats, type StatsMap } from "@/lib/storage";
-import { findVerb, TENSES, PERSON_LABEL, type Tense, type Person } from "@/lib/verbs";
-import { AlertTriangle, ArrowLeft } from "lucide-react";
+import { findVerb, TENSES, PERSON_LABEL, bestAnswerFor, type Tense, type Person, type Verb } from "@/lib/verbs";
+import { AlertTriangle, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/mistakes")({
@@ -24,12 +24,50 @@ interface Row {
 
 function personLabel(t: Tense, p: Person): string {
   if (t === "infinitivo" || t === "participio" || t === "gerundio") return "—";
-  if (t === "imperativo") return p + " !";
+  if (t === "imperativo") return `(${p})`;
   return PERSON_LABEL[p];
+}
+
+const PERSON_ORDER_2COL: Person[] = ["io", "noi", "tu", "voi", "lui", "loro"];
+
+function FullConj({ verb, tense }: { verb: Verb; tense: Tense }) {
+  const t = TENSES.find((x) => x.id === tense);
+  const persons: Person[] =
+    tense === "infinitivo" || tense === "participio" || tense === "gerundio"
+      ? (["lui"] as Person[])
+      : tense === "imperativo"
+      ? (["tu", "noi", "voi"] as Person[])
+      : PERSON_ORDER_2COL;
+  const cols = tense === "imperativo" || persons.length === 1 ? "grid-cols-1" : "grid-cols-2";
+  return (
+    <div className="mt-3 rounded-xl border border-border/60 bg-muted/30 p-3">
+      <div className={`tense-chip tense-${tense} mb-2`}>
+        <span>{t?.fr}</span><span className="opacity-70">·</span>
+        <span className="font-display italic normal-case tracking-normal">{t?.it}</span>
+      </div>
+      <div className={`grid gap-x-4 gap-y-1 text-sm ${cols}`}>
+        {persons.map((p) => {
+          const ans = bestAnswerFor(verb, tense, p);
+          if (!ans) return null;
+          const label =
+            tense === "infinitivo" ? "it." :
+            tense === "participio" || tense === "gerundio" ? "→" :
+            tense === "imperativo" ? `(${p})` : PERSON_LABEL[p];
+          return (
+            <div key={p} className="flex items-baseline gap-2">
+              <span className="w-14 shrink-0 text-right text-xs font-semibold text-muted-foreground">{label}</span>
+              <span className="font-semibold text-foreground">{ans}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function Mistakes() {
   const [stats, setStats] = useState<StatsMap>({});
+  const [expanded, setExpanded] = useState<number | null>(null);
   useEffect(() => setStats(loadStats()), []);
 
   const rows: Row[] = Object.entries(stats)
@@ -72,12 +110,16 @@ function Mistakes() {
                 const v = findVerb(r.verb);
                 const t = TENSES.find((x) => x.id === r.tense);
                 const pct = Math.round(r.rate * 100);
-                const answer = v && r.tense !== "infinitivo" && r.tense !== "presente_progressivo"
-                  ? v.conj[r.tense]?.[r.person]
-                  : undefined;
+                const answer = v ? bestAnswerFor(v, r.tense, r.person) : undefined;
+                const isOpen = expanded === idx;
                 return (
                   <li key={idx} className="rounded-xl border border-border bg-card p-3">
-                    <div className="flex items-start gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setExpanded(isOpen ? null : idx)}
+                      className="flex w-full items-start gap-3 text-left"
+                      aria-expanded={isOpen}
+                    >
                       <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-destructive/15 text-xs font-black text-destructive">
                         {idx + 1}
                       </span>
@@ -96,11 +138,15 @@ function Mistakes() {
                           )}
                         </div>
                       </div>
-                      <div className="shrink-0 text-right">
+                      <div className="flex shrink-0 items-center gap-2 text-right">
+                        <div>
                         <div className="text-lg font-black tabular-nums text-destructive">✗ {r.ko}</div>
                         <div className="text-xs text-muted-foreground">{pct}% ({r.ok}/{r.total})</div>
+                        </div>
+                        {isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
                       </div>
-                    </div>
+                    </button>
+                    {isOpen && v && <FullConj verb={v} tense={r.tense} />}
                   </li>
                 );
               })}
