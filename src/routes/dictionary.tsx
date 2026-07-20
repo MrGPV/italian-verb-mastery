@@ -144,8 +144,8 @@ function VerbFullConj({ verb }: { verb: Verb }) {
                 <span className="opacity-70">·</span>
                 <span className="font-display italic normal-case tracking-normal">{t.it}</span>
               </div>
-              <div className="grid grid-cols-2 gap-y-1 gap-x-4 text-sm">
-                {PERSON_ORDER_2COL.map((p) => {
+              <div className={`grid gap-y-1 gap-x-4 text-sm ${t.id === "imperativo" ? "grid-cols-1" : "grid-cols-2"}`}>
+                {(t.id === "imperativo" ? (["tu","noi","voi"] as Person[]) : PERSON_ORDER_2COL).map((p) => {
                   const val = (row as Partial<Record<Person, string>>)[p];
                   if (!val) return null;
                   // No irregular highlighting when we don't have a regular
