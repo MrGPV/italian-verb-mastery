@@ -9,18 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TheoryRouteImport } from './routes/theory'
 import { Route as StatsRouteImport } from './routes/stats'
 import { Route as MistakesRouteImport } from './routes/mistakes'
 import { Route as ExerciseRouteImport } from './routes/exercise'
 import { Route as DictionaryRouteImport } from './routes/dictionary'
 import { Route as IndexRouteImport } from './routes/index'
 
-const TheoryRoute = TheoryRouteImport.update({
-  id: '/theory',
-  path: '/theory',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StatsRoute = StatsRouteImport.update({
   id: '/stats',
   path: '/stats',
@@ -53,7 +47,6 @@ export interface FileRoutesByFullPath {
   '/exercise': typeof ExerciseRoute
   '/mistakes': typeof MistakesRoute
   '/stats': typeof StatsRoute
-  '/theory': typeof TheoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +54,6 @@ export interface FileRoutesByTo {
   '/exercise': typeof ExerciseRoute
   '/mistakes': typeof MistakesRoute
   '/stats': typeof StatsRoute
-  '/theory': typeof TheoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,27 +62,13 @@ export interface FileRoutesById {
   '/exercise': typeof ExerciseRoute
   '/mistakes': typeof MistakesRoute
   '/stats': typeof StatsRoute
-  '/theory': typeof TheoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/dictionary'
-    | '/exercise'
-    | '/mistakes'
-    | '/stats'
-    | '/theory'
+  fullPaths: '/' | '/dictionary' | '/exercise' | '/mistakes' | '/stats'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dictionary' | '/exercise' | '/mistakes' | '/stats' | '/theory'
-  id:
-    | '__root__'
-    | '/'
-    | '/dictionary'
-    | '/exercise'
-    | '/mistakes'
-    | '/stats'
-    | '/theory'
+  to: '/' | '/dictionary' | '/exercise' | '/mistakes' | '/stats'
+  id: '__root__' | '/' | '/dictionary' | '/exercise' | '/mistakes' | '/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -99,18 +77,10 @@ export interface RootRouteChildren {
   ExerciseRoute: typeof ExerciseRoute
   MistakesRoute: typeof MistakesRoute
   StatsRoute: typeof StatsRoute
-  TheoryRoute: typeof TheoryRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/theory': {
-      id: '/theory'
-      path: '/theory'
-      fullPath: '/theory'
-      preLoaderRoute: typeof TheoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/stats': {
       id: '/stats'
       path: '/stats'
@@ -155,7 +125,6 @@ const rootRouteChildren: RootRouteChildren = {
   ExerciseRoute: ExerciseRoute,
   MistakesRoute: MistakesRoute,
   StatsRoute: StatsRoute,
-  TheoryRoute: TheoryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
