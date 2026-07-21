@@ -7,6 +7,7 @@ export interface SessionConfig {
   count: 5 | 10 | 15 | 20;
   mode: "complet" | "mixte";
   smart: boolean;
+  topOnly?: boolean;
 }
 
 export interface AttemptStat {
@@ -27,6 +28,7 @@ export const DEFAULT_CONFIG: SessionConfig = {
   count: 10,
   mode: "mixte",
   smart: false,
+  topOnly: false,
 };
 
 export function loadConfig(): SessionConfig {
