@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { DIFFICULTIES, TENSES, type Difficulty, type Tense } from "@/lib/verbs";
 import { DEFAULT_CONFIG, loadConfig, saveConfig, type SessionConfig } from "@/lib/storage";
-import { Sparkles, PlayCircle, BookOpen, GraduationCap } from "lucide-react";
+import { Sparkles, PlayCircle, BookOpen, GraduationCap, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -132,6 +132,26 @@ function Index() {
             </div>
           </div>
           <Switch id="smart" checked={cfg.smart} onCheckedChange={(v) => setCfg((c) => ({ ...c, smart: v }))} />
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
+              <div>
+                <Label htmlFor="topOnly" className="text-sm font-semibold">Ne travailler que le Top 20 des erreurs</Label>
+                <p className="text-xs text-muted-foreground">Retravaille en priorité tes exercices les plus ratés.</p>
+              </div>
+            </div>
+            <Switch id="topOnly" checked={!!cfg.topOnly} onCheckedChange={(v) => setCfg((c) => ({ ...c, topOnly: v }))} />
+          </div>
+          {cfg.topOnly && (
+            <p className="mt-3 rounded-lg bg-destructive/5 p-2 text-xs italic text-muted-foreground">
+              Les niveaux et temps ci-dessus servent uniquement de complément si le Top 20 ne suffit pas à remplir la session.
+            </p>
+          )}
         </CardContent>
       </Card>
 
