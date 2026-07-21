@@ -15,9 +15,9 @@ export const Route = createFileRoute("/mistakes")({
 interface Row {
   verb: string;
   tense: Tense;
-  person: Person;
-  ok: number;
+  entries: { person: Person; ok: number; ko: number }[];
   ko: number;
+  ok: number;
   total: number;
   rate: number;
 }
@@ -70,14 +70,19 @@ function Mistakes() {
   const [expanded, setExpanded] = useState<number | null>(null);
   useEffect(() => setStats(loadStats()), []);
 
-  const rows: Row[] = Object.entries(stats)
-    .filter(([k]) => k.includes("__"))
-    .map(([k, s]) => {
-      const [verb, tense, person] = k.split("__") as [string, Tense, Person];
-      const total = s.ok + s.ko;
-      return { verb, tense, person, ok: s.ok, ko: s.ko, total, rate: total ? s.ok / total : 0 };
-    })
-    .filter((r) => r.ko > 0)
+  const grouped = new Map<string, Row>();
+  for (const [k, s] of Object.entries(stats)) {
+    if (!k.includes("__")) continue;
+    const [verb, tense, person] = k.split("__") as [string, Tense, Person];
+    if (s.ko <= 0) continue;
+    const key = `${verb}__${tense}`;
+    const cur = grouped.get(key) || { verb, tense, entries: [], ko: 0, ok: 0, total: 0, rate: 0 };
+    cur.entries.push({ person, ok: s.ok, ko: s.ko });
+    cur.ko += s.ko; cur.ok += s.ok; cur.total += s.ok + s.ko;
+    grouped.set(key, cur);
+  }
+  const rows: Row[] = [...grouped.values()]
+    .map((r) => ({ ...r, rate: r.total ? r.ok / r.total : 0 }))
     .sort((a, b) => b.ko - a.ko || a.rate - b.rate)
     .slice(0, 20);
 
@@ -110,8 +115,8 @@ function Mistakes() {
                 const v = findVerb(r.verb);
                 const t = TENSES.find((x) => x.id === r.tense);
                 const pct = Math.round(r.rate * 100);
-                const answer = v ? bestAnswerFor(v, r.tense, r.person) : undefined;
                 const isOpen = expanded === idx;
+                const sortedEntries = [...r.entries].sort((a, b) => b.ko - a.ko);
                 return (
                   <li key={idx} className="rounded-xl border border-border bg-card p-3">
                     <button
@@ -128,15 +133,25 @@ function Mistakes() {
                           <span className="font-display text-lg font-bold italic text-foreground">{r.verb}</span>
                           {v && <span className="truncate text-xs italic text-muted-foreground">« {v.french} »</span>}
                         </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
                           <span className={`tense-chip tense-${r.tense}`} style={{ padding: "0.15rem 0.55rem", fontSize: "0.65rem" }}>
                             {t?.fr}
                           </span>
-                          <span className="font-semibold text-muted-foreground">{personLabel(r.tense, r.person)}</span>
-                          {answer && (
-                            <span className="font-bold text-success">→ {answer}</span>
-                          )}
                         </div>
+                        <ul className="mt-1.5 space-y-0.5 text-xs">
+                          {sortedEntries.map((e) => {
+                            const ans = v ? bestAnswerFor(v, r.tense, e.person) : undefined;
+                            return (
+                              <li key={e.person} className="flex flex-wrap items-baseline gap-x-2">
+                                <span className="w-14 shrink-0 font-semibold text-muted-foreground">
+                                  {personLabel(r.tense, e.person)}
+                                </span>
+                                {ans && <span className="font-bold text-success">→ {ans}</span>}
+                                <span className="ml-auto tabular-nums text-destructive">✗ {e.ko}</span>
+                              </li>
+                            );
+                          })}
+                        </ul>
                       </div>
                       <div className="flex shrink-0 items-center gap-2 text-right">
                         <div>
