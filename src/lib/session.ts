@@ -76,19 +76,48 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
       config.difficulties.includes(v.difficulty) &&
       config.tenses.some((t) => DYN.includes(t) || v.conj[t]),
   );
-  if (pool.length === 0 || config.tenses.length === 0) return [];
   const allTenses: Tense[] = config.tenses.slice();
+
+  // Build the "top 20" priority queue of {verb, tense} combos with mistakes.
+  type Combo = { verb: Verb; tense: Tense; ko: number };
+  const topCombos: Combo[] = [];
+  if (config.topOnly) {
+    const agg = new Map<string, Combo>();
+    for (const [k, s] of Object.entries(stats)) {
+      if (!k.includes("__") || s.ko <= 0) continue;
+      const [inf, t] = k.split("__") as [string, Tense];
+      const v = VERBS.find((x) => x.infinitive === inf);
+      if (!v) continue;
+      const key = `${inf}__${t}`;
+      const cur = agg.get(key) || { verb: v, tense: t, ko: 0 };
+      cur.ko += s.ko;
+      agg.set(key, cur);
+    }
+    topCombos.push(
+      ...[...agg.values()].sort((a, b) => b.ko - a.ko).slice(0, 20),
+    );
+  }
+
+  const hasFallback = pool.length > 0 && allTenses.length > 0;
+  if (topCombos.length === 0 && !hasFallback) return [];
 
   const items: Item[] = [];
   for (let i = 0; i < config.count; i++) {
-    const weights = pool.map((v) => (config.smart ? verbWeight(v, stats) : 1));
-    const verb = pickWeighted(pool, weights);
-    // presente_progressivo & infinitivo are generated dynamically and always available
-    const availTenses = allTenses.filter(
-      (t) => t === "presente_progressivo" || t === "infinitivo" || verb.conj[t],
-    );
-    if (availTenses.length === 0) { i--; continue; }
-    const tense = availTenses[Math.floor(Math.random() * availTenses.length)];
+    let verb: Verb;
+    let tense: Tense;
+    if (config.topOnly && topCombos.length > 0) {
+      const c = pickWeighted(topCombos, topCombos.map((x) => x.ko));
+      verb = c.verb; tense = c.tense;
+    } else {
+      if (!hasFallback) break;
+      const weights = pool.map((v) => (config.smart ? verbWeight(v, stats) : 1));
+      verb = pickWeighted(pool, weights);
+      const availTenses = allTenses.filter(
+        (t) => t === "presente_progressivo" || t === "infinitivo" || verb.conj[t],
+      );
+      if (availTenses.length === 0) { i--; continue; }
+      tense = availTenses[Math.floor(Math.random() * availTenses.length)];
+    }
 
     if (tense === "infinitivo") {
       items.push({ kind: "mixte", verb, tense, questions: [buildInfinitivoQuestion(verb)] });
