@@ -16,45 +16,52 @@ export const Route = createFileRoute("/theory")({
   component: Theory,
 });
 
-// A cell can be a string (regular ending) or null (no form for that person).
 type Cell = string | null;
 type Table = {
-  cols: string[];        // column headers e.g. ["-are (parl-)", "-ere (vend-)", "-ire (sent-)"]
+  cols: string[];
   rows: { label: string; cells: Cell[] }[];
 };
-// Exceptions: each has a verb name and its irregular forms with the diverging
-// substring highlighted (bold).
-type ExceptionForm = { label: string; before: string; bold: string; after: string };
-type Exception = { verb: string; forms: ExceptionForm[] };
+// Grid exceptions: columns are irregular infinitives, rows are persons.
+// Each cell is a fully conjugated form. `hl` cells are highlighted as
+// diverging from the regular rule.
+type ExCell = { text: string; hl?: boolean } | null;
+type ExceptionsGrid = {
+  verbs: string[];
+  rows: { label: string; cells: ExCell[] }[];
+};
+// List exceptions: two-column table (infinitive → irregular form).
+type ExceptionsList = { rows: { verb: string; form: string }[] };
 
 type Block = {
   usage: string;
-  when: string;
-  examples?: string;           // regular verbs illustrating the rule
-  formula?: string;            // composite tenses (no simple ending table)
+  when: string;            // Italian-only example sentences
+  examples?: string;       // Italian regular verbs illustrating the rule
+  formula?: string;
   table?: Table;
-  extraLines?: string[];       // free-form extra rules alongside the table
-  exceptions?: Exception[];
+  extraLines?: string[];
+  exceptionsGrid?: ExceptionsGrid;
+  exceptionsList?: ExceptionsList;
 };
 
 const P = ["io", "tu", "lui/lei", "noi", "voi", "loro"];
 
+// Helper: mark cell as highlighted (irregular vs the rule)
+const h = (text: string): ExCell => ({ text, hl: true });
+const r = (text: string): ExCell => ({ text });
+
 const THEORY: Record<Tense, Block> = {
   infinitivo: {
-    usage: "Forme non conjuguée du verbe (« manger », « partir »…).",
-    when: "Après un autre verbe (voglio mangiare), après une préposition (per fare).",
+    usage: "Forme non conjuguée du verbe. Trois terminaisons : -are, -ere, -ire.",
+    when: "« Voglio mangiare. » « Per fare tutto ci vuole tempo. »",
     examples: "parlare, vedere, sentire, mangiare, dormire.",
     table: {
       cols: ["-are", "-ere", "-ire"],
       rows: [{ label: "exemples", cells: ["parlare, mangiare", "vedere, prendere", "sentire, dormire"] }],
     },
-    exceptions: [
-      { verb: "verbes réfléchis", forms: [{ label: "inf.", before: "alza", bold: "rsi", after: "" }, { label: "inf.", before: "mette", bold: "rsi", after: "" }] },
-    ],
   },
   presente: {
     usage: "Action au moment présent ou vérité générale.",
-    when: "« Je mange une pomme », « Il pleut souvent ici ».",
+    when: "« Mangio una mela. » « Piove spesso qui. »",
     examples: "parlare, vendere, sentire, finire (isc).",
     table: {
       cols: ["-are (parl-)", "-ere (vend-)", "-ire (sent-)", "-ire isc (fin-)"],
@@ -67,31 +74,42 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-ano", "-ono", "-ono", "-iscono"] },
       ],
     },
-    exceptions: [
-      { verb: "essere", forms: [{ label: "io", before: "", bold: "sono", after: "" }, { label: "tu", before: "", bold: "sei", after: "" }, { label: "lui", before: "", bold: "è", after: "" }] },
-      { verb: "avere", forms: [{ label: "io", before: "", bold: "ho", after: "" }, { label: "tu", before: "", bold: "hai", after: "" }, { label: "loro", before: "", bold: "hanno", after: "" }] },
-      { verb: "andare", forms: [{ label: "io", before: "", bold: "vado", after: "" }, { label: "loro", before: "", bold: "vanno", after: "" }] },
-      { verb: "fare", forms: [{ label: "io", before: "", bold: "faccio", after: "" }, { label: "loro", before: "", bold: "fanno", after: "" }] },
-    ],
+    exceptionsGrid: {
+      verbs: ["essere", "avere", "andare", "fare", "stare"],
+      rows: [
+        { label: P[0], cells: [h("sono"), h("ho"), h("vado"), h("faccio"), h("sto")] },
+        { label: P[1], cells: [h("sei"), h("hai"), h("vai"), h("fai"), h("stai")] },
+        { label: P[2], cells: [h("è"), h("ha"), h("va"), h("fa"), h("sta")] },
+        { label: P[3], cells: [h("siamo"), h("abbiamo"), r("andiamo"), h("facciamo"), r("stiamo")] },
+        { label: P[4], cells: [h("siete"), r("avete"), r("andate"), h("fate"), r("state")] },
+        { label: P[5], cells: [h("sono"), h("hanno"), h("vanno"), h("fanno"), h("stanno")] },
+      ],
+    },
   },
   presente_progressivo: {
     usage: "Action en cours (« être en train de… »).",
-    when: "« Sto mangiando » = je suis en train de manger.",
+    when: "« Sto mangiando. » « Stiamo lavorando. »",
     examples: "sto parlando, stai vedendo, sta dormendo.",
     formula: "stare (au présent) + gérondif du verbe.",
     table: {
       cols: ["-are → -ando", "-ere → -endo", "-ire → -endo"],
       rows: [{ label: "gérondif", cells: ["parlando", "vedendo", "sentendo"] }],
     },
-    exceptions: [
-      { verb: "fare", forms: [{ label: "gér.", before: "fa", bold: "cendo", after: "" }] },
-      { verb: "dire", forms: [{ label: "gér.", before: "di", bold: "cendo", after: "" }] },
-      { verb: "bere", forms: [{ label: "gér.", before: "be", bold: "vendo", after: "" }] },
-    ],
+    exceptionsList: {
+      rows: [
+        { verb: "fare", form: "facendo" },
+        { verb: "dire", form: "dicendo" },
+        { verb: "bere", form: "bevendo" },
+        { verb: "porre", form: "ponendo" },
+        { verb: "tradurre", form: "traducendo" },
+        { verb: "condurre", form: "conducendo" },
+        { verb: "produrre", form: "producendo" },
+      ],
+    },
   },
   passato_prossimo: {
     usage: "Action passée, terminée, souvent récente. Équivalent du passé composé.",
-    when: "« Ho mangiato una mela », « Sono andato al mare ».",
+    when: "« Ho mangiato una mela. » « Sono andato al mare. »",
     examples: "parlare → ho parlato · vendere → ho venduto · dormire → ho dormito.",
     formula: "avere ou essere (au présent) + participe passé.",
     table: {
@@ -101,19 +119,12 @@ const THEORY: Record<Tense, Block> = {
     extraLines: [
       "Auxiliaire essere : mouvement/état + réfléchis. Le participe s'accorde en genre et nombre.",
       "Auxiliaire avere : verbes transitifs. Pas d'accord avec le sujet.",
-    ],
-    exceptions: [
-      { verb: "fare", forms: [{ label: "pp", before: "fa", bold: "tto", after: "" }] },
-      { verb: "dire", forms: [{ label: "pp", before: "de", bold: "tto", after: "" }] },
-      { verb: "prendere", forms: [{ label: "pp", before: "pre", bold: "so", after: "" }] },
-      { verb: "vedere", forms: [{ label: "pp", before: "vi", bold: "sto", after: "" }] },
-      { verb: "mettere", forms: [{ label: "pp", before: "me", bold: "sso", after: "" }] },
-      { verb: "essere/stare", forms: [{ label: "pp", before: "", bold: "stato", after: "" }] },
+      "Voir les participes irréguliers dans la section « Participe passé ».",
     ],
   },
   imperfetto: {
     usage: "Description dans le passé, habitude, action en cours.",
-    when: "« Quand j'étais petit, mangiavo la pizza tous les jours ».",
+    when: "« Da piccolo, mangiavo la pizza ogni giorno. »",
     examples: "parlare, vendere, sentire.",
     table: {
       cols: ["-are", "-ere", "-ire"],
@@ -126,16 +137,21 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-avano", "-evano", "-ivano"] },
       ],
     },
-    exceptions: [
-      { verb: "essere", forms: [{ label: "io", before: "", bold: "ero", after: "" }, { label: "noi", before: "", bold: "eravamo", after: "" }] },
-      { verb: "fare", forms: [{ label: "io", before: "fa", bold: "c", after: "evo" }] },
-      { verb: "dire", forms: [{ label: "io", before: "di", bold: "c", after: "evo" }] },
-      { verb: "bere", forms: [{ label: "io", before: "be", bold: "v", after: "evo" }] },
-    ],
+    exceptionsGrid: {
+      verbs: ["essere", "fare", "dire", "bere"],
+      rows: [
+        { label: P[0], cells: [h("ero"), h("facevo"), h("dicevo"), h("bevevo")] },
+        { label: P[1], cells: [h("eri"), h("facevi"), h("dicevi"), h("bevevi")] },
+        { label: P[2], cells: [h("era"), h("faceva"), h("diceva"), h("beveva")] },
+        { label: P[3], cells: [h("eravamo"), h("facevamo"), h("dicevamo"), h("bevevamo")] },
+        { label: P[4], cells: [h("eravate"), h("facevate"), h("dicevate"), h("bevevate")] },
+        { label: P[5], cells: [h("erano"), h("facevano"), h("dicevano"), h("bevevano")] },
+      ],
+    },
   },
   futuro: {
     usage: "Action à venir ou hypothèse forte sur le présent.",
-    when: "« Domani mangerò », « Sarà stanco » (il doit être fatigué).",
+    when: "« Domani mangerò tardi. » « Sarà stanco. »",
     examples: "parlare → parlerò · vedere → vedrò · sentire → sentirò.",
     table: {
       cols: ["-are & -ere (er-)", "-ire (ir-)"],
@@ -148,17 +164,21 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-eranno", "-iranno"] },
       ],
     },
-    exceptions: [
-      { verb: "essere", forms: [{ label: "io", before: "", bold: "sar", after: "ò" }] },
-      { verb: "avere", forms: [{ label: "io", before: "a", bold: "vr", after: "ò" }] },
-      { verb: "andare", forms: [{ label: "io", before: "and", bold: "r", after: "ò" }] },
-      { verb: "vedere", forms: [{ label: "io", before: "ved", bold: "r", after: "ò" }] },
-      { verb: "potere", forms: [{ label: "io", before: "po", bold: "tr", after: "ò" }] },
-    ],
+    exceptionsGrid: {
+      verbs: ["essere", "avere", "andare", "vedere", "potere"],
+      rows: [
+        { label: P[0], cells: [h("sarò"), h("avrò"), h("andrò"), h("vedrò"), h("potrò")] },
+        { label: P[1], cells: [h("sarai"), h("avrai"), h("andrai"), h("vedrai"), h("potrai")] },
+        { label: P[2], cells: [h("sarà"), h("avrà"), h("andrà"), h("vedrà"), h("potrà")] },
+        { label: P[3], cells: [h("saremo"), h("avremo"), h("andremo"), h("vedremo"), h("potremo")] },
+        { label: P[4], cells: [h("sarete"), h("avrete"), h("andrete"), h("vedrete"), h("potrete")] },
+        { label: P[5], cells: [h("saranno"), h("avranno"), h("andranno"), h("vedranno"), h("potranno")] },
+      ],
+    },
   },
   condizionale: {
     usage: "Politesse, souhait, conseil, hypothèse.",
-    when: "« Vorrei un caffè », « Dovresti dormire ».",
+    when: "« Vorrei un caffè. » « Dovresti dormire di più. »",
     examples: "parlare → parlerei · vedere → vedrei · sentire → sentirei.",
     table: {
       cols: ["-are & -ere", "-ire"],
@@ -171,15 +191,21 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-erebbero", "-irebbero"] },
       ],
     },
-    exceptions: [
-      { verb: "essere", forms: [{ label: "io", before: "", bold: "sar", after: "ei" }] },
-      { verb: "avere", forms: [{ label: "io", before: "a", bold: "vr", after: "ei" }] },
-      { verb: "andare", forms: [{ label: "io", before: "and", bold: "r", after: "ei" }] },
-    ],
+    exceptionsGrid: {
+      verbs: ["essere", "avere", "andare", "vedere", "potere"],
+      rows: [
+        { label: P[0], cells: [h("sarei"), h("avrei"), h("andrei"), h("vedrei"), h("potrei")] },
+        { label: P[1], cells: [h("saresti"), h("avresti"), h("andresti"), h("vedresti"), h("potresti")] },
+        { label: P[2], cells: [h("sarebbe"), h("avrebbe"), h("andrebbe"), h("vedrebbe"), h("potrebbe")] },
+        { label: P[3], cells: [h("saremmo"), h("avremmo"), h("andremmo"), h("vedremmo"), h("potremmo")] },
+        { label: P[4], cells: [h("sareste"), h("avreste"), h("andreste"), h("vedreste"), h("potreste")] },
+        { label: P[5], cells: [h("sarebbero"), h("avrebbero"), h("andrebbero"), h("vedrebbero"), h("potrebbero")] },
+      ],
+    },
   },
   congiuntivo: {
     usage: "Subjonctif : doute, souhait, opinion, subordonnées après « che ».",
-    when: "« Penso che parli bene », « Voglio che tu senta questa canzone ».",
+    when: "« Penso che tu parli bene. » « Voglio che senta questa canzone. »",
     examples: "parlare, vendere, sentire, finire (isc).",
     table: {
       cols: ["-are (parl-)", "-ere (vend-)", "-ire (sent-)", "-ire isc (fin-)"],
@@ -192,16 +218,21 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-ino", "-ano", "-ano", "-iscano"] },
       ],
     },
-    exceptions: [
-      { verb: "essere", forms: [{ label: "io", before: "", bold: "sia", after: "" }] },
-      { verb: "avere", forms: [{ label: "io", before: "", bold: "abbia", after: "" }] },
-      { verb: "andare", forms: [{ label: "io", before: "", bold: "vada", after: "" }] },
-      { verb: "fare", forms: [{ label: "io", before: "", bold: "faccia", after: "" }] },
-    ],
+    exceptionsGrid: {
+      verbs: ["essere", "avere", "andare", "fare", "sapere"],
+      rows: [
+        { label: P[0], cells: [h("sia"), h("abbia"), h("vada"), h("faccia"), h("sappia")] },
+        { label: P[1], cells: [h("sia"), h("abbia"), h("vada"), h("faccia"), h("sappia")] },
+        { label: P[2], cells: [h("sia"), h("abbia"), h("vada"), h("faccia"), h("sappia")] },
+        { label: P[3], cells: [h("siamo"), h("abbiamo"), r("andiamo"), h("facciamo"), h("sappiamo")] },
+        { label: P[4], cells: [h("siate"), h("abbiate"), r("andiate"), h("facciate"), h("sappiate")] },
+        { label: P[5], cells: [h("siano"), h("abbiano"), h("vadano"), h("facciano"), h("sappiano")] },
+      ],
+    },
   },
   imperativo: {
     usage: "Donner un ordre, un conseil, une consigne.",
-    when: "« Mangia ! », « Andiamo ! », « Ascoltate ! ».",
+    when: "« Mangia! » « Andiamo! » « Ascoltate! »",
     examples: "parlare, vendere, sentire.",
     table: {
       cols: ["-are", "-ere", "-ire"],
@@ -211,45 +242,78 @@ const THEORY: Record<Tense, Block> = {
         { label: "(voi)", cells: ["-ate", "-ete", "-ite"] },
       ],
     },
-    extraLines: ["Négatif 2ᵉ p. sing. : non + infinitif (« non parlare ! »)."],
-    exceptions: [
-      { verb: "andare", forms: [{ label: "tu", before: "", bold: "va'", after: "" }] },
-      { verb: "dare", forms: [{ label: "tu", before: "", bold: "da'", after: "" }] },
-      { verb: "fare", forms: [{ label: "tu", before: "", bold: "fa'", after: "" }] },
-      { verb: "stare", forms: [{ label: "tu", before: "", bold: "sta'", after: "" }] },
-      { verb: "dire", forms: [{ label: "tu", before: "", bold: "di'", after: "" }] },
-    ],
+    extraLines: ["Négatif 2ᵉ p. sing. : non + infinitif (« non parlare! »)."],
+    exceptionsGrid: {
+      verbs: ["andare", "dare", "fare", "stare", "dire"],
+      rows: [
+        { label: "(tu)", cells: [h("va'"), h("da'"), h("fa'"), h("sta'"), h("di'")] },
+        { label: "(noi)", cells: [r("andiamo"), r("diamo"), h("facciamo"), r("stiamo"), h("diciamo")] },
+        { label: "(voi)", cells: [r("andate"), r("date"), h("fate"), r("state"), h("dite")] },
+      ],
+    },
   },
   participio: {
     usage: "Sert à composer les temps composés et peut aussi être un adjectif.",
-    when: "Combiné à avere/essere pour le passato prossimo, trapassato…",
+    when: "« Ho parlato. » « Sono arrivato. »",
     examples: "parlare → parlato · vendere → venduto · sentire → sentito.",
     table: {
       cols: ["-are → -ato", "-ere → -uto", "-ire → -ito"],
       rows: [{ label: "part. passé", cells: ["parlato", "venduto", "sentito"] }],
     },
-    exceptions: [
-      { verb: "fare", forms: [{ label: "pp", before: "fa", bold: "tto", after: "" }] },
-      { verb: "dire", forms: [{ label: "pp", before: "de", bold: "tto", after: "" }] },
-      { verb: "prendere", forms: [{ label: "pp", before: "pre", bold: "so", after: "" }] },
-      { verb: "vedere", forms: [{ label: "pp", before: "vi", bold: "sto", after: "" }] },
-      { verb: "mettere", forms: [{ label: "pp", before: "me", bold: "sso", after: "" }] },
-      { verb: "aprire", forms: [{ label: "pp", before: "a", bold: "perto", after: "" }] },
-    ],
+    exceptionsList: {
+      rows: [
+        { verb: "essere", form: "stato" },
+        { verb: "stare", form: "stato" },
+        { verb: "avere", form: "avuto" },
+        { verb: "fare", form: "fatto" },
+        { verb: "dire", form: "detto" },
+        { verb: "prendere", form: "preso" },
+        { verb: "vedere", form: "visto" },
+        { verb: "mettere", form: "messo" },
+        { verb: "scrivere", form: "scritto" },
+        { verb: "leggere", form: "letto" },
+        { verb: "aprire", form: "aperto" },
+        { verb: "chiudere", form: "chiuso" },
+        { verb: "venire", form: "venuto" },
+        { verb: "morire", form: "morto" },
+        { verb: "nascere", form: "nato" },
+        { verb: "offrire", form: "offerto" },
+        { verb: "chiedere", form: "chiesto" },
+        { verb: "rispondere", form: "risposto" },
+        { verb: "rimanere", form: "rimasto" },
+        { verb: "vivere", form: "vissuto" },
+        { verb: "bere", form: "bevuto" },
+        { verb: "correre", form: "corso" },
+        { verb: "decidere", form: "deciso" },
+        { verb: "perdere", form: "perso" },
+        { verb: "rompere", form: "rotto" },
+        { verb: "scegliere", form: "scelto" },
+        { verb: "spegnere", form: "spento" },
+        { verb: "succedere", form: "successo" },
+        { verb: "vincere", form: "vinto" },
+        { verb: "cuocere", form: "cotto" },
+      ],
+    },
   },
   gerundio: {
     usage: "Équivalent du gérondif français (« en …ant »).",
-    when: "Manière ou simultanéité : « leggendo » = en lisant.",
+    when: "« Leggendo si impara. » « Camminando ho incontrato Marco. »",
     examples: "parlare → parlando · vedere → vedendo · sentire → sentendo.",
     table: {
       cols: ["-are → -ando", "-ere → -endo", "-ire → -endo"],
       rows: [{ label: "gérondif", cells: ["parlando", "vedendo", "sentendo"] }],
     },
-    exceptions: [
-      { verb: "fare", forms: [{ label: "gér.", before: "fa", bold: "cendo", after: "" }] },
-      { verb: "dire", forms: [{ label: "gér.", before: "di", bold: "cendo", after: "" }] },
-      { verb: "bere", forms: [{ label: "gér.", before: "be", bold: "vendo", after: "" }] },
-    ],
+    exceptionsList: {
+      rows: [
+        { verb: "fare", form: "facendo" },
+        { verb: "dire", form: "dicendo" },
+        { verb: "bere", form: "bevendo" },
+        { verb: "porre", form: "ponendo" },
+        { verb: "tradurre", form: "traducendo" },
+        { verb: "condurre", form: "conducendo" },
+        { verb: "produrre", form: "producendo" },
+      ],
+    },
   },
 };
 
@@ -342,12 +406,12 @@ function Theory() {
                           </tr>
                         </thead>
                         <tbody>
-                          {b.table.rows.map((r, i) => (
+                          {b.table.rows.map((row, i) => (
                             <tr key={i}>
                               <td className="border border-border/60 bg-muted/30 p-1.5 text-right text-[11px] font-bold text-muted-foreground">
-                                {r.label}
+                                {row.label}
                               </td>
-                              {r.cells.map((c, j) => (
+                              {row.cells.map((c, j) => (
                                 <td key={j} className="border border-border/60 p-1.5 text-center font-semibold text-foreground">
                                   {c ?? "—"}
                                 </td>
@@ -362,28 +426,74 @@ function Theory() {
                     <p key={i} className="mt-2 text-xs text-foreground">{line}</p>
                   ))}
                 </div>
-                {b.exceptions && b.exceptions.length > 0 && (
+                {b.exceptionsGrid && (
                   <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2">
                     <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-destructive">
                       Exceptions notoires
                     </div>
-                    <ul className="space-y-1 text-xs">
-                      {b.exceptions.map((ex, i) => (
-                        <li key={i} className="flex flex-wrap items-baseline gap-x-2">
-                          <span className="font-display text-sm font-bold italic text-foreground">{ex.verb}</span>
-                          <span className="flex flex-wrap gap-x-2 gap-y-0.5">
-                            {ex.forms.map((f, j) => (
-                              <span key={j} className="whitespace-nowrap">
-                                <span className="mr-1 text-[10px] font-semibold uppercase text-muted-foreground">{f.label}</span>
-                                <span className="text-foreground">{f.before}</span>
-                                <strong className="font-black text-destructive">{f.bold}</strong>
-                                <span className="text-foreground">{f.after}</span>
-                              </span>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-xs">
+                        <thead>
+                          <tr>
+                            <th className="border border-border/60 bg-muted/40 p-1.5"></th>
+                            {b.exceptionsGrid.verbs.map((v, i) => (
+                              <th key={i} className="border border-border/60 bg-muted/40 p-1.5 text-center">
+                                <span className="font-display text-sm font-black italic text-foreground">{v}</span>
+                              </th>
                             ))}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {b.exceptionsGrid.rows.map((row, i) => (
+                            <tr key={i}>
+                              <td className="border border-border/60 bg-muted/30 p-1.5 text-right text-[11px] font-bold text-muted-foreground">
+                                {row.label}
+                              </td>
+                              {row.cells.map((c, j) => (
+                                <td key={j} className="border border-border/60 p-1.5 text-center">
+                                  {c === null ? (
+                                    <span className="text-muted-foreground">—</span>
+                                  ) : c.hl ? (
+                                    <strong className="font-black text-destructive">{c.text}</strong>
+                                  ) : (
+                                    <span className="text-foreground">{c.text}</span>
+                                  )}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                {b.exceptionsList && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2">
+                    <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-destructive">
+                      Exceptions notoires
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-xs">
+                        <thead>
+                          <tr>
+                            <th className="border border-border/60 bg-muted/40 p-1.5 text-left font-bold">Infinitif</th>
+                            <th className="border border-border/60 bg-muted/40 p-1.5 text-left font-bold">Forme irrégulière</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {b.exceptionsList.rows.map((row, i) => (
+                            <tr key={i}>
+                              <td className="border border-border/60 p-1.5">
+                                <span className="font-display italic font-semibold text-foreground">{row.verb}</span>
+                              </td>
+                              <td className="border border-border/60 p-1.5">
+                                <strong className="font-black text-destructive">{row.form}</strong>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
               </CardContent>
