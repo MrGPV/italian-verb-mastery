@@ -39,15 +39,9 @@ type Block = {
   formula?: string;
   table?: Table;
   extraLines?: string[];
-  exceptionsGrid?: ExceptionsGrid;
-  exceptionsList?: ExceptionsList;
 };
 
 const P = ["io", "tu", "lui/lei", "noi", "voi", "loro"];
-
-// Helper: mark cell as highlighted (irregular vs the rule)
-const h = (text: string): ExCell => ({ text, hl: true });
-const r = (text: string): ExCell => ({ text });
 
 const THEORY: Record<Tense, Block> = {
   infinitivo: {
