@@ -78,9 +78,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Conjuga — Apprends la conjugaison italienne" },
-      { name: "description", content: "Application mobile pour apprendre la conjugaison italienne depuis le français : entraînement intelligent, statistiques, tous les temps." },
-      { property: "og:title", content: "Conjuga — Conjugaison italienne" },
+      { title: "Il Giardino dei Verbi — Apprends la conjugaison italienne" },
+      { name: "description", content: "Il Giardino dei Verbi : application mobile pour apprendre la conjugaison italienne depuis le français — entraînement intelligent, statistiques, tous les temps." },
+      { property: "og:title", content: "Il Giardino dei Verbi — Conjugaison italienne" },
       { property: "og:description", content: "Entraîne-toi à la conjugaison italienne avec un mode intelligent qui cible tes points faibles." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

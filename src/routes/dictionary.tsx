@@ -14,7 +14,7 @@ import {
 export const Route = createFileRoute("/dictionary")({
   head: () => ({
     meta: [
-      { title: "Coniugatore — Conjuga" },
+      { title: "Coniugatore — Il Giardino dei Verbi" },
       { name: "description", content: "Cherche un verbe italien et vois toute sa conjugaison." },
     ],
   }),

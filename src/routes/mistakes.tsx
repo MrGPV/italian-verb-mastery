@@ -8,7 +8,7 @@ import { AlertTriangle, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/mistakes")({
-  head: () => ({ meta: [{ title: "Top erreurs — Conjuga" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Top erreurs — Il Giardino dei Verbi" }, { name: "robots", content: "noindex" }] }),
   component: Mistakes,
 });
 

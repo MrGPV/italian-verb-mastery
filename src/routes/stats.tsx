@@ -8,7 +8,7 @@ import { VERBS, findVerb } from "@/lib/verbs";
 import { Trash2, TrendingUp, Target } from "lucide-react";
 
 export const Route = createFileRoute("/stats")({
-  head: () => ({ meta: [{ title: "Statistiques — Conjuga" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Statistiques — Il Giardino dei Verbi" }, { name: "robots", content: "noindex" }] }),
   component: Stats,
 });
 

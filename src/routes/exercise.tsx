@@ -11,7 +11,7 @@ import { PERSON_LABEL, TENSES, diffParts } from "@/lib/verbs";
 import { CheckCircle2, XCircle, BookOpen, ArrowRight, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/exercise")({
-  head: () => ({ meta: [{ title: "Session — Conjuga" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Session — Il Giardino dei Verbi" }, { name: "robots", content: "noindex" }] }),
   component: Exercise,
 });
 

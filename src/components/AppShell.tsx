@@ -13,10 +13,16 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl text-lg font-black text-primary-foreground shadow-[var(--shadow-soft)]" style={{ background: "var(--gradient-hero)" }}>
-              C
+            <img
+              src="/favicon.png"
+              alt="Il Giardino dei Verbi"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-xl shadow-[var(--shadow-soft)]"
+            />
+            <span className="font-display text-lg font-black italic tracking-tight leading-none">
+              Il Giardino<br/><span className="text-primary">dei Verbi</span>
             </span>
-            <span className="font-display text-xl font-black tracking-tight">Conjuga</span>
           </Link>
           <div className="flex items-center gap-1">
             <Button asChild variant="ghost" size="icon" aria-label="Accueil">

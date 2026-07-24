@@ -4,12 +4,12 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { TENSES, type Tense } from "@/lib/verbs";
+import { TENSES, VERBS, regularReference, PERSONS, type Person, type Tense, type Verb } from "@/lib/verbs";
 
 export const Route = createFileRoute("/theory")({
   head: () => ({
     meta: [
-      { title: "Théorie — Conjuga" },
+      { title: "Théorie — Il Giardino dei Verbi" },
       { name: "description", content: "Théorie de la conjugaison italienne : chaque temps expliqué." },
     ],
   }),

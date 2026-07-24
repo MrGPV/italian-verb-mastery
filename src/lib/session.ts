@@ -106,7 +106,8 @@ export function buildSession(config: SessionConfig, stats: StatsMap): Item[] {
     let verb: Verb;
     let tense: Tense;
     if (config.topOnly && topCombos.length > 0) {
-      const c = pickWeighted(topCombos, topCombos.map((x) => x.ko));
+      // Uniform sampling across the whole top-20 (not just the highest).
+      const c = topCombos[Math.floor(Math.random() * topCombos.length)];
       verb = c.verb; tense = c.tense;
     } else {
       if (!hasFallback) break;
