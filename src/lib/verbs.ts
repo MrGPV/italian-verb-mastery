@@ -838,7 +838,11 @@ export function regularReference(v: Verb): Partial<Record<Tense, Partial<Record<
   let stem = "";
   if (base.endsWith("are")) { stem = base.slice(0, -3); raw = regAre(stem); }
   else if (base.endsWith("ere")) { stem = base.slice(0, -3); raw = regEre(stem); }
-  else if (base.endsWith("ire")) { stem = base.slice(0, -3); raw = regIre(stem); }
+  else if (base.endsWith("ire")) {
+    stem = base.slice(0, -3);
+    const isc = v.conj.presente?.io === stem + "isco";
+    raw = regIre(stem, isc);
+  }
   else if (base.endsWith("rre")) { stem = base.slice(0, -3); raw = regEre(stem); }
   if (!raw) return {};
   const regPart = raw.participio!.lui!;

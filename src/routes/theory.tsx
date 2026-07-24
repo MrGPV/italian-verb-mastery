@@ -4,12 +4,15 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { TENSES, type Tense } from "@/lib/verbs";
+import {
+  TENSES, VERBS, PERSONS, regularReference,
+  type Person, type Tense,
+} from "@/lib/verbs";
 
 export const Route = createFileRoute("/theory")({
   head: () => ({
     meta: [
-      { title: "Théorie — Conjuga" },
+      { title: "Théorie — Il Giardino dei Verbi" },
       { name: "description", content: "Théorie de la conjugaison italienne : chaque temps expliqué." },
     ],
   }),
@@ -21,35 +24,20 @@ type Table = {
   cols: string[];
   rows: { label: string; cells: Cell[] }[];
 };
-// Grid exceptions: columns are irregular infinitives, rows are persons.
-// Each cell is a fully conjugated form. `hl` cells are highlighted as
-// diverging from the regular rule.
 type ExCell = { text: string; hl?: boolean } | null;
-type ExceptionsGrid = {
-  verbs: string[];
-  rows: { label: string; cells: ExCell[] }[];
-};
-// List exceptions: two-column table (infinitive → irregular form).
-type ExceptionsList = { rows: { verb: string; form: string }[] };
 
 type Block = {
   usage: string;
-  when: string;            // Italian-only example sentences
-  examples?: string;       // Italian regular verbs illustrating the rule
+  when: string;
+  examples?: string;
   formula?: string;
   table?: Table;
   extraLines?: string[];
-  exceptionsGrid?: ExceptionsGrid;
-  exceptionsList?: ExceptionsList;
 };
 
 const P = ["io", "tu", "lui/lei", "noi", "voi", "loro"];
 
-// Helper: mark cell as highlighted (irregular vs the rule)
-const h = (text: string): ExCell => ({ text, hl: true });
-const r = (text: string): ExCell => ({ text });
-
-const THEORY: Record<Tense, Block> = {
+const THEORY: Partial<Record<Tense, Block>> = {
   infinitivo: {
     usage: "Forme non conjuguée du verbe. Trois terminaisons : -are, -ere, -ire.",
     when: "« Voglio mangiare. » « Per fare tutto ci vuole tempo. »",
@@ -74,17 +62,6 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-ano", "-ono", "-ono", "-iscono"] },
       ],
     },
-    exceptionsGrid: {
-      verbs: ["essere", "avere", "andare", "fare", "stare"],
-      rows: [
-        { label: P[0], cells: [h("sono"), h("ho"), h("vado"), h("faccio"), h("sto")] },
-        { label: P[1], cells: [h("sei"), h("hai"), h("vai"), h("fai"), h("stai")] },
-        { label: P[2], cells: [h("è"), h("ha"), h("va"), h("fa"), h("sta")] },
-        { label: P[3], cells: [h("siamo"), h("abbiamo"), r("andiamo"), h("facciamo"), r("stiamo")] },
-        { label: P[4], cells: [h("siete"), r("avete"), r("andate"), h("fate"), r("state")] },
-        { label: P[5], cells: [h("sono"), h("hanno"), h("vanno"), h("fanno"), h("stanno")] },
-      ],
-    },
   },
   presente_progressivo: {
     usage: "Action en cours (« être en train de… »).",
@@ -94,17 +71,6 @@ const THEORY: Record<Tense, Block> = {
     table: {
       cols: ["-are → -ando", "-ere → -endo", "-ire → -endo"],
       rows: [{ label: "gérondif", cells: ["parlando", "vedendo", "sentendo"] }],
-    },
-    exceptionsList: {
-      rows: [
-        { verb: "fare", form: "facendo" },
-        { verb: "dire", form: "dicendo" },
-        { verb: "bere", form: "bevendo" },
-        { verb: "porre", form: "ponendo" },
-        { verb: "tradurre", form: "traducendo" },
-        { verb: "condurre", form: "conducendo" },
-        { verb: "produrre", form: "producendo" },
-      ],
     },
   },
   passato_prossimo: {
@@ -137,17 +103,6 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-avano", "-evano", "-ivano"] },
       ],
     },
-    exceptionsGrid: {
-      verbs: ["essere", "fare", "dire", "bere"],
-      rows: [
-        { label: P[0], cells: [h("ero"), h("facevo"), h("dicevo"), h("bevevo")] },
-        { label: P[1], cells: [h("eri"), h("facevi"), h("dicevi"), h("bevevi")] },
-        { label: P[2], cells: [h("era"), h("faceva"), h("diceva"), h("beveva")] },
-        { label: P[3], cells: [h("eravamo"), h("facevamo"), h("dicevamo"), h("bevevamo")] },
-        { label: P[4], cells: [h("eravate"), h("facevate"), h("dicevate"), h("bevevate")] },
-        { label: P[5], cells: [h("erano"), h("facevano"), h("dicevano"), h("bevevano")] },
-      ],
-    },
   },
   futuro: {
     usage: "Action à venir ou hypothèse forte sur le présent.",
@@ -162,17 +117,6 @@ const THEORY: Record<Tense, Block> = {
         { label: P[3], cells: ["-eremo", "-iremo"] },
         { label: P[4], cells: ["-erete", "-irete"] },
         { label: P[5], cells: ["-eranno", "-iranno"] },
-      ],
-    },
-    exceptionsGrid: {
-      verbs: ["essere", "avere", "andare", "vedere", "potere"],
-      rows: [
-        { label: P[0], cells: [h("sarò"), h("avrò"), h("andrò"), h("vedrò"), h("potrò")] },
-        { label: P[1], cells: [h("sarai"), h("avrai"), h("andrai"), h("vedrai"), h("potrai")] },
-        { label: P[2], cells: [h("sarà"), h("avrà"), h("andrà"), h("vedrà"), h("potrà")] },
-        { label: P[3], cells: [h("saremo"), h("avremo"), h("andremo"), h("vedremo"), h("potremo")] },
-        { label: P[4], cells: [h("sarete"), h("avrete"), h("andrete"), h("vedrete"), h("potrete")] },
-        { label: P[5], cells: [h("saranno"), h("avranno"), h("andranno"), h("vedranno"), h("potranno")] },
       ],
     },
   },
@@ -191,17 +135,6 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-erebbero", "-irebbero"] },
       ],
     },
-    exceptionsGrid: {
-      verbs: ["essere", "avere", "andare", "vedere", "potere"],
-      rows: [
-        { label: P[0], cells: [h("sarei"), h("avrei"), h("andrei"), h("vedrei"), h("potrei")] },
-        { label: P[1], cells: [h("saresti"), h("avresti"), h("andresti"), h("vedresti"), h("potresti")] },
-        { label: P[2], cells: [h("sarebbe"), h("avrebbe"), h("andrebbe"), h("vedrebbe"), h("potrebbe")] },
-        { label: P[3], cells: [h("saremmo"), h("avremmo"), h("andremmo"), h("vedremmo"), h("potremmo")] },
-        { label: P[4], cells: [h("sareste"), h("avreste"), h("andreste"), h("vedreste"), h("potreste")] },
-        { label: P[5], cells: [h("sarebbero"), h("avrebbero"), h("andrebbero"), h("vedrebbero"), h("potrebbero")] },
-      ],
-    },
   },
   congiuntivo: {
     usage: "Subjonctif : doute, souhait, opinion, subordonnées après « che ».",
@@ -218,17 +151,6 @@ const THEORY: Record<Tense, Block> = {
         { label: P[5], cells: ["-ino", "-ano", "-ano", "-iscano"] },
       ],
     },
-    exceptionsGrid: {
-      verbs: ["essere", "avere", "andare", "fare", "sapere"],
-      rows: [
-        { label: P[0], cells: [h("sia"), h("abbia"), h("vada"), h("faccia"), h("sappia")] },
-        { label: P[1], cells: [h("sia"), h("abbia"), h("vada"), h("faccia"), h("sappia")] },
-        { label: P[2], cells: [h("sia"), h("abbia"), h("vada"), h("faccia"), h("sappia")] },
-        { label: P[3], cells: [h("siamo"), h("abbiamo"), r("andiamo"), h("facciamo"), h("sappiamo")] },
-        { label: P[4], cells: [h("siate"), h("abbiate"), r("andiate"), h("facciate"), h("sappiate")] },
-        { label: P[5], cells: [h("siano"), h("abbiano"), h("vadano"), h("facciano"), h("sappiano")] },
-      ],
-    },
   },
   imperativo: {
     usage: "Donner un ordre, un conseil, une consigne.",
@@ -243,14 +165,6 @@ const THEORY: Record<Tense, Block> = {
       ],
     },
     extraLines: ["Négatif 2ᵉ p. sing. : non + infinitif (« non parlare! »)."],
-    exceptionsGrid: {
-      verbs: ["andare", "dare", "fare", "stare", "dire"],
-      rows: [
-        { label: "(tu)", cells: [h("va'"), h("da'"), h("fa'"), h("sta'"), h("di'")] },
-        { label: "(noi)", cells: [r("andiamo"), r("diamo"), h("facciamo"), r("stiamo"), h("diciamo")] },
-        { label: "(voi)", cells: [r("andate"), r("date"), h("fate"), r("state"), h("dite")] },
-      ],
-    },
   },
   participio: {
     usage: "Sert à composer les temps composés et peut aussi être un adjectif.",
@@ -259,40 +173,6 @@ const THEORY: Record<Tense, Block> = {
     table: {
       cols: ["-are → -ato", "-ere → -uto", "-ire → -ito"],
       rows: [{ label: "part. passé", cells: ["parlato", "venduto", "sentito"] }],
-    },
-    exceptionsList: {
-      rows: [
-        { verb: "essere", form: "stato" },
-        { verb: "stare", form: "stato" },
-        { verb: "avere", form: "avuto" },
-        { verb: "fare", form: "fatto" },
-        { verb: "dire", form: "detto" },
-        { verb: "prendere", form: "preso" },
-        { verb: "vedere", form: "visto" },
-        { verb: "mettere", form: "messo" },
-        { verb: "scrivere", form: "scritto" },
-        { verb: "leggere", form: "letto" },
-        { verb: "aprire", form: "aperto" },
-        { verb: "chiudere", form: "chiuso" },
-        { verb: "venire", form: "venuto" },
-        { verb: "morire", form: "morto" },
-        { verb: "nascere", form: "nato" },
-        { verb: "offrire", form: "offerto" },
-        { verb: "chiedere", form: "chiesto" },
-        { verb: "rispondere", form: "risposto" },
-        { verb: "rimanere", form: "rimasto" },
-        { verb: "vivere", form: "vissuto" },
-        { verb: "bere", form: "bevuto" },
-        { verb: "correre", form: "corso" },
-        { verb: "decidere", form: "deciso" },
-        { verb: "perdere", form: "perso" },
-        { verb: "rompere", form: "rotto" },
-        { verb: "scegliere", form: "scelto" },
-        { verb: "spegnere", form: "spento" },
-        { verb: "succedere", form: "successo" },
-        { verb: "vincere", form: "vinto" },
-        { verb: "cuocere", form: "cotto" },
-      ],
     },
   },
   gerundio: {
@@ -303,24 +183,96 @@ const THEORY: Record<Tense, Block> = {
       cols: ["-are → -ando", "-ere → -endo", "-ire → -endo"],
       rows: [{ label: "gérondif", cells: ["parlando", "vedendo", "sentendo"] }],
     },
-    exceptionsList: {
-      rows: [
-        { verb: "fare", form: "facendo" },
-        { verb: "dire", form: "dicendo" },
-        { verb: "bere", form: "bevendo" },
-        { verb: "porre", form: "ponendo" },
-        { verb: "tradurre", form: "traducendo" },
-        { verb: "condurre", form: "conducendo" },
-        { verb: "produrre", form: "producendo" },
-      ],
-    },
   },
 };
+
+// ---- Exception detection: compute directly from the verb database ----
+
+type FiniteRow = { label: string; cells: ExCell[] };
+type FiniteGrid = { verbs: string[]; rows: FiniteRow[] };
+
+// Persons per tense
+const FINITE_TENSES: Tense[] = [
+  "presente", "imperfetto", "futuro", "condizionale", "congiuntivo",
+];
+const IMP_PERSONS: Person[] = ["tu", "noi", "voi"];
+
+function chunk<T>(a: T[], n: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < a.length; i += n) out.push(a.slice(i, i + n));
+  return out;
+}
+
+function collectFinite(tense: Tense, persons: Person[]): { verb: string; cells: ExCell[] }[] {
+  const out: { verb: string; cells: ExCell[] }[] = [];
+  for (const v of VERBS) {
+    if (v.difficulty === "riflessivo") continue;
+    const actual = v.conj[tense];
+    if (!actual) continue;
+    const reg = regularReference(v)[tense];
+    if (!reg) continue;
+    let anyDiff = false;
+    const cells: ExCell[] = persons.map((p) => {
+      const a = actual[p];
+      const rr = reg[p];
+      if (!a) return null;
+      if (a !== rr) { anyDiff = true; return { text: a, hl: true }; }
+      return { text: a };
+    });
+    if (anyDiff) out.push({ verb: v.infinitive, cells });
+  }
+  return out;
+}
+
+function collectSimple(tense: "participio" | "gerundio"): { verb: string; form: string }[] {
+  const out: { verb: string; form: string }[] = [];
+  for (const v of VERBS) {
+    if (v.difficulty === "riflessivo") continue;
+    const a = v.conj[tense]?.lui ?? (tense === "participio" ? v.participle : "");
+    const rr = regularReference(v)[tense]?.lui ?? "";
+    if (a && rr && a !== rr) out.push({ verb: v.infinitive, form: a });
+  }
+  return out;
+}
+
+function buildGrids(tense: Tense, persons: Person[], perTable = 5): FiniteGrid[] {
+  const items = collectFinite(tense, persons);
+  return chunk(items, perTable).map((group) => ({
+    verbs: group.map((g) => g.verb),
+    rows: persons.map((p, i) => ({
+      label: p === "lui" ? "lui/lei" : p,
+      cells: group.map((g) => g.cells[i]),
+    })),
+  }));
+}
+
+function buildImperativoGrids(perTable = 5): FiniteGrid[] {
+  const items = collectFinite("imperativo", IMP_PERSONS);
+  return chunk(items, perTable).map((group) => ({
+    verbs: group.map((g) => g.verb),
+    rows: IMP_PERSONS.map((p, i) => ({
+      label: `(${p})`,
+      cells: group.map((g) => g.cells[i]),
+    })),
+  }));
+}
+
+function gridsForTense(tense: Tense): FiniteGrid[] {
+  if (FINITE_TENSES.includes(tense)) return buildGrids(tense, PERSONS);
+  if (tense === "imperativo") return buildImperativoGrids();
+  return [];
+}
+
+function listForTense(tense: Tense): { verb: string; form: string }[] {
+  if (tense === "participio") return collectSimple("participio");
+  if (tense === "gerundio" || tense === "presente_progressivo") return collectSimple("gerundio");
+  return [];
+}
 
 function Theory() {
   const [hidden, setHidden] = useState<Set<Tense>>(new Set());
   const toggle = (t: Tense) =>
-    setHidden((h) => { const n = new Set(h); n.has(t) ? n.delete(t) : n.add(t); return n; });
+    setHidden((prev) => { const n = new Set(prev); if (n.has(t)) n.delete(t); else n.add(t); return n; });
 
   return (
     <AppShell>
@@ -363,6 +315,8 @@ function Theory() {
         {TENSES.filter((t) => !hidden.has(t.id)).map((t) => {
           const b = THEORY[t.id];
           if (!b) return null;
+          const grids = gridsForTense(t.id);
+          const list = listForTense(t.id);
           return (
             <Card key={t.id} className="overflow-hidden">
               <CardContent className="space-y-3 pt-5">
@@ -426,51 +380,55 @@ function Theory() {
                     <p key={i} className="mt-2 text-xs text-foreground">{line}</p>
                   ))}
                 </div>
-                {b.exceptionsGrid && (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2">
-                    <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-destructive">
-                      Exceptions notoires
+
+                {grids.length > 0 && (
+                  <div className="space-y-2 rounded-lg border border-destructive/30 bg-destructive/5 p-2">
+                    <div className="text-xs font-bold uppercase tracking-wide text-destructive">
+                      Exceptions notoires ({collectFinite(t.id, t.id === "imperativo" ? IMP_PERSONS : PERSONS).length})
                     </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse text-xs">
-                        <thead>
-                          <tr>
-                            <th className="border border-border/60 bg-muted/40 p-1.5"></th>
-                            {b.exceptionsGrid.verbs.map((v, i) => (
-                              <th key={i} className="border border-border/60 bg-muted/40 p-1.5 text-center">
-                                <span className="font-display text-sm font-black italic text-foreground">{v}</span>
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {b.exceptionsGrid.rows.map((row, i) => (
-                            <tr key={i}>
-                              <td className="border border-border/60 bg-muted/30 p-1.5 text-right text-[11px] font-bold text-muted-foreground">
-                                {row.label}
-                              </td>
-                              {row.cells.map((c, j) => (
-                                <td key={j} className="border border-border/60 p-1.5 text-center">
-                                  {c === null ? (
-                                    <span className="text-muted-foreground">—</span>
-                                  ) : c.hl ? (
-                                    <strong className="font-black text-destructive">{c.text}</strong>
-                                  ) : (
-                                    <span className="text-foreground">{c.text}</span>
-                                  )}
-                                </td>
+                    {grids.map((g, gi) => (
+                      <div key={gi} className="overflow-x-auto">
+                        <table className="w-full border-collapse text-xs">
+                          <thead>
+                            <tr>
+                              <th className="border border-border/60 bg-muted/40 p-1.5"></th>
+                              {g.verbs.map((v, i) => (
+                                <th key={i} className="border border-border/60 bg-muted/40 p-1.5 text-center">
+                                  <span className="font-display text-sm font-black italic text-foreground">{v}</span>
+                                </th>
                               ))}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody>
+                            {g.rows.map((row, i) => (
+                              <tr key={i}>
+                                <td className="border border-border/60 bg-muted/30 p-1.5 text-right text-[11px] font-bold text-muted-foreground">
+                                  {row.label}
+                                </td>
+                                {row.cells.map((c, j) => (
+                                  <td key={j} className="border border-border/60 p-1.5 text-center">
+                                    {c === null ? (
+                                      <span className="text-muted-foreground">—</span>
+                                    ) : c.hl ? (
+                                      <strong className="font-black text-destructive">{c.text}</strong>
+                                    ) : (
+                                      <span className="text-foreground">{c.text}</span>
+                                    )}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
                   </div>
                 )}
-                {b.exceptionsList && (
+
+                {list.length > 0 && (
                   <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2">
                     <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-destructive">
-                      Exceptions notoires
+                      Exceptions notoires ({list.length})
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full border-collapse text-xs">
@@ -481,7 +439,7 @@ function Theory() {
                           </tr>
                         </thead>
                         <tbody>
-                          {b.exceptionsList.rows.map((row, i) => (
+                          {list.map((row, i) => (
                             <tr key={i}>
                               <td className="border border-border/60 p-1.5">
                                 <span className="font-display italic font-semibold text-foreground">{row.verb}</span>
