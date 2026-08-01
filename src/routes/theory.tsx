@@ -382,12 +382,15 @@ function Theory() {
                 </div>
 
                 {grids.length > 0 && (
-                  <div className="space-y-2 rounded-lg border border-destructive/30 bg-destructive/5 p-2">
+                  <div className="space-y-5 rounded-lg border border-destructive/30 bg-destructive/5 p-2">
                     <div className="text-xs font-bold uppercase tracking-wide text-destructive">
                       Exceptions notoires ({collectFinite(t.id, t.id === "imperativo" ? IMP_PERSONS : PERSONS).length})
                     </div>
                     {grids.map((g, gi) => (
-                      <div key={gi} className="overflow-x-auto">
+                      <div
+                        key={gi}
+                        className="overflow-x-auto rounded-md border-2 border-destructive/25 bg-card/70 p-1.5 shadow-[var(--shadow-soft)]"
+                      >
                         <table className="w-full border-collapse text-xs">
                           <thead>
                             <tr>
