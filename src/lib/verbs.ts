@@ -1,3 +1,5 @@
+import { VERB_SPECS, DERIVED_SPECS, URRE_SPECS, type Spec, type DerivedSpec, type SpecOver } from "./verbs-list";
+
 // Italian verb database with conjugations and pedagogical notes.
 // Tenses: presente, passato_prossimo, imperfetto, futuro, condizionale, congiuntivo
 
