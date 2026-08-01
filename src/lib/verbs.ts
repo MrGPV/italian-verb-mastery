@@ -1,3 +1,5 @@
+import { VERB_SPECS, DERIVED_SPECS, URRE_SPECS, type Spec, type DerivedSpec, type SpecOver } from "./verbs-list";
+
 // Italian verb database with conjugations and pedagogical notes.
 // Tenses: presente, passato_prossimo, imperfetto, futuro, condizionale, congiuntivo
 
@@ -60,17 +62,34 @@ export interface Verb {
 
 // Helpers to generate regular -are/-ere/-ire conjugations
 type RegularConj = Partial<Record<Tense, Record<Person, string>>>;
+
+// Orthographic rules for -are verbs:
+//  - stems in -c / -g keep the hard sound before e/i  (cercare -> cerchi, pago -> paghi)
+//  - stems in -ci / -gi drop the i before e/i         (mangiare -> mangi, mangerò)
+//  - other stems in -i drop the i before another i    (studiare -> studi, studiamo)
+function jAre(stem: string, ending: string): string {
+  const last = stem.slice(-1);
+  const prev = stem.slice(-2, -1);
+  const e0 = ending[0];
+  if (last === "i") {
+    if ((prev === "c" || prev === "g") && (e0 === "i" || e0 === "e")) return stem.slice(0, -1) + ending;
+    if (e0 === "i") return stem.slice(0, -1) + ending;
+  }
+  if ((last === "c" || last === "g") && (e0 === "i" || e0 === "e")) return stem + "h" + ending;
+  return stem + ending;
+}
 function regAre(stem: string): RegularConj {
+  const j = (e: string) => jAre(stem, e);
   return {
-    presente: { io: stem + "o", tu: stem + "i", lui: stem + "a", noi: stem + "iamo", voi: stem + "ate", loro: stem + "ano" },
-    imperfetto: { io: stem + "avo", tu: stem + "avi", lui: stem + "ava", noi: stem + "avamo", voi: stem + "avate", loro: stem + "avano" },
-    futuro: { io: stem + "erò", tu: stem + "erai", lui: stem + "erà", noi: stem + "eremo", voi: stem + "erete", loro: stem + "eranno" },
-    condizionale: { io: stem + "erei", tu: stem + "eresti", lui: stem + "erebbe", noi: stem + "eremmo", voi: stem + "ereste", loro: stem + "erebbero" },
-    congiuntivo: { io: stem + "i", tu: stem + "i", lui: stem + "i", noi: stem + "iamo", voi: stem + "iate", loro: stem + "ino" },
+    presente: { io: j("o"), tu: j("i"), lui: j("a"), noi: j("iamo"), voi: j("ate"), loro: j("ano") },
+    imperfetto: { io: j("avo"), tu: j("avi"), lui: j("ava"), noi: j("avamo"), voi: j("avate"), loro: j("avano") },
+    futuro: { io: j("erò"), tu: j("erai"), lui: j("erà"), noi: j("eremo"), voi: j("erete"), loro: j("eranno") },
+    condizionale: { io: j("erei"), tu: j("eresti"), lui: j("erebbe"), noi: j("eremmo"), voi: j("ereste"), loro: j("erebbero") },
+    congiuntivo: { io: j("i"), tu: j("i"), lui: j("i"), noi: j("iamo"), voi: j("iate"), loro: j("ino") },
     passato_prossimo: {} as any,
-    imperativo: { io: "", tu: stem + "a", lui: "", noi: stem + "iamo", voi: stem + "ate", loro: "" },
-    participio: { io: "", tu: "", lui: stem + "ato", noi: "", voi: "", loro: "" },
-    gerundio: { io: "", tu: "", lui: stem + "ando", noi: "", voi: "", loro: "" },
+    imperativo: { io: "", tu: j("a"), lui: "", noi: j("iamo"), voi: j("ate"), loro: "" },
+    participio: { io: "", tu: "", lui: j("ato"), noi: "", voi: "", loro: "" },
+    gerundio: { io: "", tu: "", lui: j("ando"), noi: "", voi: "", loro: "" },
   };
 }
 function regEre(stem: string): RegularConj {
@@ -186,17 +205,17 @@ function reflexive(infinitive: string, french: string, stem: string, participle:
   conj.passato_prossimo = reflexivePassato(participle);
   // Reflexive imperative / participio / gerundio with enclitic pronouns
   const impTu =
-    kind === "are" ? stem + "ati" :
+    kind === "are" ? jAre(stem, "ati") :
     kind === "ere" ? stem + "iti" :
     kind === "ire-isc" ? stem + "isciti" :
     stem + "iti";
-  const impNoi = stem + "iamoci";
+  const impNoi = kind === "are" ? jAre(stem, "iamoci") : stem + "iamoci";
   const impVoi =
-    kind === "are" ? stem + "atevi" :
+    kind === "are" ? jAre(stem, "atevi") :
     kind === "ere" ? stem + "etevi" :
     stem + "itevi";
   const gerund =
-    kind === "are" ? stem + "andosi" : stem + "endosi";
+    kind === "are" ? jAre(stem, "andosi") : stem + "endosi";
   conj.imperativo = { tu: impTu, noi: impNoi, voi: impVoi } as any;
   conj.participio = { lui: participle } as any;
   conj.gerundio = { lui: gerund } as any;
@@ -696,6 +715,146 @@ function withExtras(v: Verb): Verb {
   return { ...v, conj };
 }
 
+// ---- Expansion of the compact spec list ------------------------------------
+function regGliere(stem: string): RegularConj {
+  return {
+    presente: { io: stem + "lgo", tu: stem + "gli", lui: stem + "glie", noi: stem + "gliamo", voi: stem + "gliete", loro: stem + "lgono" },
+    imperfetto: { io: stem + "glievo", tu: stem + "glievi", lui: stem + "glieva", noi: stem + "glievamo", voi: stem + "glievate", loro: stem + "glievano" },
+    futuro: { io: stem + "glierò", tu: stem + "glierai", lui: stem + "glierà", noi: stem + "glieremo", voi: stem + "glierete", loro: stem + "glieranno" },
+    condizionale: { io: stem + "glierei", tu: stem + "glieresti", lui: stem + "glierebbe", noi: stem + "glieremmo", voi: stem + "gliereste", loro: stem + "glierebbero" },
+    congiuntivo: { io: stem + "lga", tu: stem + "lga", lui: stem + "lga", noi: stem + "gliamo", voi: stem + "gliate", loro: stem + "lgano" },
+    imperativo: { io: "", tu: stem + "gli", lui: "", noi: stem + "gliamo", voi: stem + "gliete", loro: "" },
+  };
+}
+function regUrre(stem: string): RegularConj {
+  return {
+    presente: { io: stem + "uco", tu: stem + "uci", lui: stem + "uce", noi: stem + "uciamo", voi: stem + "ucete", loro: stem + "ucono" },
+    imperfetto: { io: stem + "ucevo", tu: stem + "ucevi", lui: stem + "uceva", noi: stem + "ucevamo", voi: stem + "ucevate", loro: stem + "ucevano" },
+    futuro: { io: stem + "urrò", tu: stem + "urrai", lui: stem + "urrà", noi: stem + "urremo", voi: stem + "urrete", loro: stem + "urranno" },
+    condizionale: { io: stem + "urrei", tu: stem + "urresti", lui: stem + "urrebbe", noi: stem + "urremmo", voi: stem + "urreste", loro: stem + "urrebbero" },
+    congiuntivo: { io: stem + "uca", tu: stem + "uca", lui: stem + "uca", noi: stem + "uciamo", voi: stem + "uciate", loro: stem + "ucano" },
+    imperativo: { io: "", tu: stem + "uci", lui: "", noi: stem + "uciamo", voi: stem + "ucete", loro: "" },
+  };
+}
+function mergeOver(
+  conj: Partial<Record<Tense, Partial<Record<Person, string>>>>,
+  over: SpecOver,
+): Partial<Record<Tense, Partial<Record<Person, string>>>> {
+  const out: Partial<Record<Tense, Partial<Record<Person, string>>>> = { ...conj };
+  (Object.keys(over) as Tense[]).forEach((t) => {
+    out[t] = { ...(out[t] ?? {}), ...(over[t] as Partial<Record<Person, string>>) };
+  });
+  return out;
+}
+function catToDifficulty(cat: "c" | "r" | "i" | "x"): Difficulty {
+  return cat === "c" ? "courant" : cat === "r" ? "regulier" : cat === "i" ? "irregulier" : "riflessivo";
+}
+function fromSpec(s: Spec): Verb {
+  const [inf, fr, cat, kind, auxCode, part, over] = s;
+  const aux: "avere" | "essere" = auxCode === "e" ? "essere" : "avere";
+  if (kind.startsWith("r-")) {
+    const base = inf.slice(0, -2) + "e";
+    const stem = base.slice(0, -3);
+    const k = kind === "r-are" ? "are" : kind === "r-ere" ? "ere" : kind === "r-isc" ? "ire-isc" : "ire";
+    const defPart = k === "are" ? jAre(stem, "ato") : k === "ere" ? stem + "uto" : stem + "ito";
+    const v = reflexive(inf, fr, stem, part ?? defPart, k as "are" | "ere" | "ire" | "ire-isc");
+    return over ? { ...v, conj: mergeOver(v.conj, over) } : v;
+  }
+  let conj: RegularConj;
+  let defPart: string;
+  let gerund: string;
+  if (kind === "gliere") {
+    const stem = inf.slice(0, -6);
+    conj = regGliere(stem); defPart = stem + "lto"; gerund = stem + "gliendo";
+  } else if (kind === "urre") {
+    const stem = inf.slice(0, -4);
+    conj = regUrre(stem); defPart = stem + "otto"; gerund = stem + "ucendo";
+  } else if (kind === "are") {
+    const stem = inf.slice(0, -3);
+    conj = regAre(stem); defPart = jAre(stem, "ato"); gerund = jAre(stem, "ando");
+  } else if (kind === "ere") {
+    const stem = inf.slice(0, -3);
+    conj = regEre(stem); defPart = stem + "uto"; gerund = stem + "endo";
+  } else {
+    const stem = inf.slice(0, -3);
+    conj = regIre(stem, kind === "isc"); defPart = stem + "ito"; gerund = stem + "endo";
+  }
+  return {
+    infinitive: inf, french: fr, difficulty: catToDifficulty(cat), aux,
+    participle: part ?? defPart, gerund,
+    conj: over ? mergeOver(conj, over) : conj,
+  };
+}
+function fromDerived(d: DerivedSpec): Verb | null {
+  const [inf, fr, cat, baseInf, prefix, auxCode, part, refl] = d;
+  const b = rawVerbs.find((v) => v.infinitive === baseInf);
+  if (!b) return null;
+  const conj: RegularConj = {};
+  (Object.keys(b.conj) as Tense[]).forEach((t) => {
+    if (t === "passato_prossimo" || t === "participio" || t === "gerundio") return;
+    const row = b.conj[t];
+    if (!row) return;
+    const nr: Record<string, string> = {};
+    PERSONS.forEach((p) => { const val = row[p]; if (val) nr[p] = prefix + val; });
+    conj[t] = nr as Record<Person, string>;
+  });
+  const baseGer = b.gerund ?? IRREG_EXTRAS[baseInf]?.gerund ?? "";
+  const baseImp = IRREG_EXTRAS[baseInf]?.imp;
+  if (baseImp) {
+    conj.imperativo = {
+      io: "", lui: "", loro: "",
+      tu: baseImp.tu ? prefix + baseImp.tu : "",
+      noi: baseImp.noi ? prefix + baseImp.noi : "",
+      voi: baseImp.voi ? prefix + baseImp.voi : "",
+    } as Record<Person, string>;
+  }
+  const participle = part ?? prefix + b.participle;
+  const gerund = baseGer ? prefix + baseGer : undefined;
+  if (!refl) {
+    return {
+      infinitive: inf, french: fr, difficulty: catToDifficulty(cat),
+      aux: auxCode === "e" ? "essere" : "avere",
+      participle, gerund, conj,
+    };
+  }
+  const rc = toReflexive(conj);
+  rc.passato_prossimo = reflexivePassato(participle);
+  const impTu = conj.imperativo?.tu, impNoi = conj.imperativo?.noi, impVoi = conj.imperativo?.voi;
+  rc.imperativo = {
+    io: "", lui: "", loro: "",
+    tu: impTu ? impTu + "ti" : "",
+    noi: impNoi ? impNoi + "ci" : "",
+    voi: impVoi ? impVoi + "vi" : "",
+  } as Record<Person, string>;
+  rc.participio = { io: "", tu: "", lui: participle, noi: "", voi: "", loro: "" };
+  const gs = gerund ? gerund + "si" : undefined;
+  if (gs) rc.gerundio = { io: "", tu: "", lui: gs, noi: "", voi: "", loro: "" };
+  return {
+    infinitive: inf, french: fr, difficulty: "riflessivo", aux: "essere",
+    participle, gerund: gs, conj: rc,
+    notes: {
+      passato_prossimo: "Verbe pronominal : toujours avec ESSERE, le participe s'accorde avec le sujet.",
+    },
+  };
+}
+
+const allSpecs: Spec[] = [
+  ...VERB_SPECS,
+  ...URRE_SPECS.map(([inf, fr, cat, stem, aux, part]): Spec => {
+    void stem;
+    return [inf, fr, cat, "urre", aux, part];
+  }),
+];
+for (const s of allSpecs) {
+  if (rawVerbs.some((v) => v.infinitive === s[0])) continue;
+  rawVerbs.push(fromSpec(s));
+}
+for (const d of DERIVED_SPECS) {
+  if (rawVerbs.some((v) => v.infinitive === d[0])) continue;
+  const v = fromDerived(d);
+  if (v) rawVerbs.push(v);
+}
+
 export const VERBS: Verb[] = rawVerbs.map(withPassato).map(withExtras);
 
 export function findVerb(inf: string): Verb | undefined {
@@ -849,7 +1008,7 @@ export function regularReference(v: Verb): Partial<Record<Tense, Partial<Record<
   if (isRefl) {
     const refl = toReflexive(raw);
     refl.passato_prossimo = reflexivePassato(regPart);
-    const gerund = base.endsWith("are") ? stem + "andosi" : stem + "endosi";
+    const gerund = base.endsWith("are") ? jAre(stem, "andosi") : stem + "endosi";
     refl.gerundio = { io: "", tu: "", lui: gerund, noi: "", voi: "", loro: "" };
     refl.participio = { io: "", tu: "", lui: regPart, noi: "", voi: "", loro: "" };
     return refl;
