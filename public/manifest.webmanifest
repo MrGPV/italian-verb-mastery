@@ -4,8 +4,8 @@
   "description": "Apprends la conjugaison italienne depuis le français — entraînement intelligent, statistiques, tous les temps.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#c2410c",
+  "background_color": "#0b2416",
+  "theme_color": "#0b2416",
   "orientation": "portrait",
   "icons": [
     {
