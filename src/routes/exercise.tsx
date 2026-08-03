@@ -51,7 +51,7 @@ function Exercise() {
 
   if (items.length === 0) {
     return (
-      <AppShell>
+      <AppShell bare>
         <Card><CardContent className="pt-6 text-center text-sm text-muted-foreground">Aucune question disponible avec ces réglages.</CardContent></Card>
       </AppShell>
     );
@@ -61,7 +61,7 @@ function Exercise() {
     const total = score.ok + score.ko;
     const pct = total ? Math.round((score.ok / total) * 100) : 0;
     return (
-      <AppShell>
+      <AppShell bare>
         <Card className="animate-pop overflow-hidden">
           <div className="tricolore-bar" />
           <div className="p-6 text-center">
@@ -130,7 +130,7 @@ function Exercise() {
   const hideFrench = firstQ.hideFrench;
 
   return (
-    <AppShell>
+    <AppShell bare>
       <div className="mb-4 flex items-center gap-3">
         <Progress value={progress} className="h-2" />
         <span className="text-xs font-semibold tabular-nums text-muted-foreground">{i + 1}/{items.length}</span>
