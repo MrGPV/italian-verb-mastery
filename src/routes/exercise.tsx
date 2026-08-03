@@ -131,7 +131,7 @@ function Exercise() {
 
   return (
     <AppShell bare>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-3 flex items-center gap-3 pr-11">
         <Progress value={progress} className="h-2" />
         <span className="text-xs font-semibold tabular-nums text-muted-foreground">{i + 1}/{items.length}</span>
       </div>
@@ -169,9 +169,9 @@ function Exercise() {
                 const border = !checked ? "" : ok ? "border-success bg-success/10" : "border-destructive bg-destructive/10";
                 const ref = checked && !ok ? bestReference(inputs[k] ?? "", q) : q.answer;
                 return (
-                  <div key={k} className="grid grid-cols-[5.5rem_1fr] items-center gap-2">
+                  <div key={k} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
                     <div className="text-right">
-                      <span className="rounded-md bg-accent/50 px-2 py-1 text-sm font-bold" style={{ color: "oklch(0.32 0.12 148)" }}>
+                      <span className="block whitespace-nowrap rounded-md bg-accent/50 px-2 py-1 text-sm font-bold" style={{ color: "oklch(0.32 0.12 148)" }}>
                         {q.subject}
                       </span>
                     </div>
@@ -183,7 +183,15 @@ function Exercise() {
                         onFocus={() => { focusedIdx.current = k; }}
                         disabled={checked}
                         placeholder="…"
+                        type="text"
+                        name={`risposta-${k}`}
+                        inputMode="text"
+                        enterKeyHint="done"
                         autoComplete="off"
+                        autoCorrect="off"
+                        data-form-type="other"
+                        data-lpignore="true"
+                        data-1p-ignore
                         autoCapitalize="none"
                         spellCheck={false}
                         className={`h-11 text-base font-semibold transition-colors ${border}`}
