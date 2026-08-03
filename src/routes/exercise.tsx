@@ -161,7 +161,7 @@ function Exercise() {
             </div>
           )}
 
-          <form onSubmit={(e) => { e.preventDefault(); state === "input" ? check() : next(); }}>
+          <form autoComplete="off" onSubmit={(e) => { e.preventDefault(); state === "input" ? check() : next(); }}>
             <div className="space-y-2">
               {item.questions.map((q, k) => {
                 const checked = state === "checked";
